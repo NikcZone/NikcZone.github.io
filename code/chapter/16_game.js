@@ -15,6 +15,9 @@ var simpleLevelPlan = `
  var sndcorri=new Audio();
  sndcorri.src='corri_.wav';
  sndcorri.loop = true;
+ sndcorri.addEventListener('timeupdate', function() {
+   if (sndcorri.currentTime > 0.4) sndcorri.currentTime = 0;
+ });
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
  var snd= new Audio();
@@ -236,6 +239,12 @@ State.prototype.update = function(time, keys) {
 
   let player = newState.player;
   if (this.level.touches(player.pos, player.size, "lava")) {
+    if (sndmorto) sndmorto.play().catch(() => {});
+    if (sndcorri && corriPlaying) {
+      corriPlaying = false;
+      sndcorri.pause();
+      sndcorri.currentTime = 0;
+    }
     return new State(this.level, actors, "lost");
   }
 
