@@ -11,7 +11,8 @@ var simpleLevelPlan = `
  var chiedi=prompt("Attivare audio[s\n]")
  if (chiedi=="s"){
 
- 	 
+ var sndsalto= new Audio();
+ sndsalto.src='salto.wav'; 
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
  var snd= new Audio();
@@ -288,8 +289,7 @@ var gravity = 30;
 var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
-  var sndsalto= new Audio();
-  sndsalto.src='salto.wav';
+  
   var sndcorri=new Audio();
   sndcorri.src='corri_.wav';
   let xSpeed = 0;
@@ -316,7 +316,7 @@ Player.prototype.update = function(time, state, keys) {
   if (!state.level.touches(movedY, this.size, "wall")) {
     pos = movedY;
   } else if (keys.ArrowUp && ySpeed > 0) {
-    sndsalto.play();	
+    
     ySpeed = -jumpSpeed;
   } else {
     sndsalto.stop();
