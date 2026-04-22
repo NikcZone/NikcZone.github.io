@@ -16,14 +16,13 @@ var simpleLevelPlan = `
  sndcorri.src='corri_.wav';
  sndcorri.loop = true;
  sndcorri.addEventListener('timeupdate', function() {
-   if (sndcorri.currentTime > 0.8) sndcorri.currentTime = 0;
+   if (sndcorri.currentTime > 0.1) sndcorri.currentTime = 0;
  });
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
  var snd= new Audio();
  snd.src='soldi.wav';
- var sndsalto= new Audio();
- sndsalto.src='salto.wav';
+ 
  }
 var Level = class Level {
   constructor(plan) {
@@ -307,7 +306,8 @@ var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
   
-  
+  var sndsalto= new Audio();
+  sndsalto.src='salto.wav';
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
@@ -337,8 +337,9 @@ Player.prototype.update = function(time, state, keys) {
     sndsalto.play();
     ySpeed = -jumpSpeed;
   } else {
-    sndsalto.pause();
+    
     ySpeed = 0;
+    sndsalto.pause();
   }
   return new Player(pos, new Vec(xSpeed, ySpeed));
 };
