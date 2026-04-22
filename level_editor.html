@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Level Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0d0d;
+    color: #e2e8f0;
+    font-family: 'Share Tech Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* TOP BAR */
+  #topbar {
+    background: #111;
+    border-bottom: 2px solid #22c55e;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  #topbar h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: #22c55e;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .sep { color: #333; font-size: 20px; }
+  .btn {
+    background: #1a1a1a;
+    border: 1px solid #374151;
+    color: #9ca3af;
+    padding: 5px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.1s;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: #22c55e; color: #22c55e; background: #0f2310; }
+  .btn.danger:hover { border-color: #ef4444; color: #ef4444; background: #1a0a0a; }
+
+  label { font-size: 12px; color: #6b7280; white-space: nowrap; }
+  input[type=number] {
+    background: #1a1a1a;
+    border: 1px solid #374151;
+    color: #e2e8f0;
+    padding: 4px 6px;
+    width: 60px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+  }
+
+  /* MAIN AREA */
+  #main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: 130px;
+    background: #111;
+    border-right: 2px solid #1f2937;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 8px;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+  #sidebar h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    color: #4b5563;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .tile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1a1a1a;
+    border: 2px solid #1f2937;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: all 0.1s;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: #9ca3af;
+  }
+  .tile-btn:hover { border-color: #374151; color: #e2e8f0; }
+  .tile-btn.active { border-color: #22c55e; color: #22c55e; background: #0f2310; }
+  .tile-preview {
+    width: 18px; height: 18px;
+    border: 1px solid #374151;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+  .key-hint {
+    margin-left: auto;
+    font-size: 9px;
+    color: #374151;
+  }
+  .tile-btn.active .key-hint { color: #166534; }
+
+  .tool-section { margin-top: 8px; }
+  .tool-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1a1a1a;
+    border: 2px solid #1f2937;
+    padding: 6px 8px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: #9ca3af;
+    transition: all 0.1s;
+    margin-bottom: 4px;
+  }
+  .tool-btn:hover { border-color: #374151; color: #e2e8f0; }
+  .tool-btn.active { border-color: #facc15; color: #facc15; background: #1a1500; }
+
+  /* CANVAS AREA */
+  #canvas-wrap {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    cursor: crosshair;
+    background: #0a0a0a;
+    background-image:
+      linear-gradient(#111 1px, transparent 1px),
+      linear-gradient(90deg, #111 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  #grid { display: block; }
+
+  /* STATUS BAR */
+  #statusbar {
+    background: #111;
+    border-top: 1px solid #1f2937;
+    padding: 4px 16px;
+    display: flex;
+    gap: 24px;
+    font-size: 11px;
+    color: #4b5563;
+    flex-shrink: 0;
+  }
+  #statusbar span { color: #6b7280; }
+  #statusbar b { color: #22c55e; }
+
+  /* MODAL */
+  #modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  #modal-overlay.show { display: flex; }
+  #modal {
+    background: #111;
+    border: 2px solid #22c55e;
+    padding: 24px;
+    width: 600px;
+    max-width: 90vw;
+  }
+  #modal h3 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #22c55e;
+    margin-bottom: 16px;
+  }
+  #modal textarea {
+    width: 100%;
+    height: 240px;
+    background: #0a0a0a;
+    border: 1px solid #374151;
+    color: #22c55e;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 10px;
+    resize: vertical;
+  }
+  #modal-hint { font-size: 11px; color: #4b5563; margin: 8px 0; }
+  .modal-btns { display: flex; gap: 8px; margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <h1>▸ LEVEL EDITOR</h1>
+  <span class="sep">|</span>
+  <label>W <input type="number" id="inp-w" value="80" min="20" max="200"></label>
+  <label>H <input type="number" id="inp-h" value="25" min="10" max="60"></label>
+  <button class="btn" onclick="resizeGrid()">Ridimensiona</button>
+  <span class="sep">|</span>
+  <button class="btn" onclick="newLevel()">Nuovo</button>
+  <button class="btn" onclick="openImport()">Importa</button>
+  <button class="btn" onclick="openExport()">Esporta</button>
+  <button class="btn" onclick="copyToClipboard()">📋 Copia</button>
+  <span class="sep">|</span>
+  <button class="btn" onclick="undo()" title="Ctrl+Z">↩ Undo</button>
+  <button class="btn danger" onclick="clearGrid()">Pulisci</button>
+  <span class="sep">|</span>
+  <label>Zoom: <input type="number" id="inp-zoom" value="16" min="6" max="40" onchange="setZoom(+this.value)"></label>
+</div>
+
+<div id="main">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <h2>TILES</h2>
+
+    <div class="tile-btn active" data-tile="." onclick="selectTile('.')">
+      <div class="tile-preview" style="background:#111;"></div>
+      <span>Vuoto</span>
+      <span class="key-hint">1</span>
+    </div>
+    <div class="tile-btn" data-tile="#" onclick="selectTile('#')">
+      <div class="tile-preview" style="background:#4b5563;"></div>
+      <span>Muro</span>
+      <span class="key-hint">2</span>
+    </div>
+    <div class="tile-btn" data-tile="+" onclick="selectTile('+')">
+      <div class="tile-preview" style="background:#dc2626;"></div>
+      <span>Lava</span>
+      <span class="key-hint">3</span>
+    </div>
+    <div class="tile-btn" data-tile="=" onclick="selectTile('=')">
+      <div class="tile-preview" style="background:#ea580c;">→</div>
+      <span>Lava H</span>
+      <span class="key-hint">4</span>
+    </div>
+    <div class="tile-btn" data-tile="|" onclick="selectTile('|')">
+      <div class="tile-preview" style="background:#d97706;">↕</div>
+      <span>Lava V</span>
+      <span class="key-hint">5</span>
+    </div>
+    <div class="tile-btn" data-tile="v" onclick="selectTile('v')">
+      <div class="tile-preview" style="background:#92400e;">↓</div>
+      <span>Lava↓</span>
+      <span class="key-hint">6</span>
+    </div>
+    <div class="tile-btn" data-tile="o" onclick="selectTile('o')">
+      <div class="tile-preview" style="background:#ca8a04; border-radius:50%;"></div>
+      <span>Moneta</span>
+      <span class="key-hint">7</span>
+    </div>
+    <div class="tile-btn" data-tile="@" onclick="selectTile('@')">
+      <div class="tile-preview" style="background:#15803d;">@</div>
+      <span>Player</span>
+      <span class="key-hint">8</span>
+    </div>
+
+    <div class="tool-section">
+      <h2>TOOL</h2>
+      <button class="tool-btn active" id="tool-paint" onclick="selectTool('paint')">✏ Penna</button>
+      <button class="tool-btn" id="tool-fill" onclick="selectTool('fill')">🪣 Riempi</button>
+      <button class="tool-btn" id="tool-line" onclick="selectTool('line')">╱ Linea</button>
+    </div>
+
+    <div class="tool-section" style="margin-top:auto; padding-top:12px;">
+      <div style="font-size:10px; color:#374151; line-height:1.8;">
+        <div>🖱 drag = disegna</div>
+        <div>🔘 mid/space = pan</div>
+        <div>⚙ scroll = zoom</div>
+        <div>Ctrl+Z = undo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div id="canvas-wrap">
+    <canvas id="grid"></canvas>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <span>Cella: <b id="st-pos">-</b></span>
+  <span>Griglia: <b id="st-size">80×25</b></span>
+  <span>Zoom: <b id="st-zoom">16px</b></span>
+  <span>Tile: <b id="st-tile">.</b></span>
+  <span>Tool: <b id="st-tool">penna</b></span>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h3 id="modal-title">ESPORTA LIVELLO</h3>
+    <p id="modal-hint"></p>
+    <textarea id="modal-text"></textarea>
+    <div class="modal-btns">
+      <button class="btn" id="modal-action-btn">OK</button>
+      <button class="btn" onclick="closeModal()">Chiudi</button>
+      <button class="btn" id="modal-copy-btn" style="margin-left:auto;" onclick="copyModal()">📋 Copia tutto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== STATE =====================
+let gridW = 80, gridH = 25;
+let grid = [];
+let cellSize = 16;
+let offsetX = 40, offsetY = 40;
+let selectedTile = '.';
+let currentTool = 'paint';
+let isPainting = false;
+let isPanning = false;
+let panStartX, panStartY, panStartOX, panStartOY;
+let spaceDown = false;
+let undoStack = [];
+
+// Line tool state
+let lineStart = null;
+let linePreview = [];
+
+const TILE_COLORS = {
+  '.': { bg: '#0d1117', border: '#161b22' },
+  '#': { bg: '#374151', border: '#4b5563' },
+  '+': { bg: '#7f1d1d', border: '#dc2626' },
+  '=': { bg: '#7c2d12', border: '#ea580c', label: '→' },
+  '|': { bg: '#78350f', border: '#d97706', label: '↕' },
+  'v': { bg: '#451a03', border: '#92400e', label: '↓' },
+  'o': { bg: '#713f12', border: '#eab308', circle: true },
+  '@': { bg: '#14532d', border: '#22c55e', label: '@' },
+};
+
+// ===================== GRID INIT =====================
+function makeGrid(w, h, fill='.') {
+  return Array.from({length: h}, () => Array(w).fill(fill));
+}
+
+function initGrid(w, h) {
+  gridW = w; gridH = h;
+  grid = makeGrid(w, h);
+  undoStack = [];
+  updateStatus();
+  render();
+}
+
+function newLevel() {
+  if (!confirm('Nuovo livello? Tutto verrà cancellato.')) return;
+  gridW = +document.getElementById('inp-w').value || 80;
+  gridH = +document.getElementById('inp-h').value || 25;
+  initGrid(gridW, gridH);
+}
+
+function clearGrid() {
+  if (!confirm('Pulire tutta la griglia?')) return;
+  pushUndo();
+  grid = makeGrid(gridW, gridH);
+  render();
+}
+
+function resizeGrid() {
+  const nw = +document.getElementById('inp-w').value || 80;
+  const nh = +document.getElementById('inp-h').value || 25;
+  pushUndo();
+  const newGrid = makeGrid(nw, nh);
+  for (let r=0; r<Math.min(nh, gridH); r++)
+    for (let c=0; c<Math.min(nw, gridW); c++)
+      newGrid[r][c] = grid[r][c];
+  gridW = nw; gridH = nh;
+  grid = newGrid;
+  document.getElementById('st-size').textContent = `${gridW}×${gridH}`;
+  render();
+}
+
+// ===================== UNDO =====================
+function pushUndo() {
+  undoStack.push(grid.map(r => [...r]));
+  if (undoStack.length > 40) undoStack.shift();
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  grid = undoStack.pop();
+  gridW = grid[0].length;
+  gridH = grid.length;
+  render();
+}
+
+// ===================== CANVAS =====================
+const canvas = document.getElementById('grid');
+const ctx = canvas.getContext('2d');
+const wrap = document.getElementById('canvas-wrap');
+
+function fitCanvas() {
+  canvas.width = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  render();
+}
+
+function render() {
+  const cw = canvas.width, ch = canvas.height;
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.fillStyle = '#080808';
+  ctx.fillRect(0, 0, cw, ch);
+
+  // Visible cell range
+  const startC = Math.max(0, Math.floor(-offsetX / cellSize));
+  const endC   = Math.min(gridW, Math.ceil((cw - offsetX) / cellSize));
+  const startR = Math.max(0, Math.floor(-offsetY / cellSize));
+  const endR   = Math.min(gridH, Math.ceil((ch - offsetY) / cellSize));
+
+  // Draw cells
+  for (let r = startR; r < endR; r++) {
+    for (let c = startC; c < endC; c++) {
+      const ch_ = grid[r][c];
+      const t = TILE_COLORS[ch_] || TILE_COLORS['.'];
+      const x = offsetX + c * cellSize;
+      const y = offsetY + r * cellSize;
+      const s = cellSize - 1;
+
+      ctx.fillStyle = t.bg;
+      ctx.fillRect(x, y, s, s);
+
+      if (ch_ !== '.') {
+        // Border highlight
+        ctx.strokeStyle = t.border;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + 0.5, y + 0.5, s - 1, s - 1);
+
+        // Circle for coin
+        if (t.circle && cellSize >= 10) {
+          ctx.beginPath();
+          ctx.arc(x + s/2, y + s/2, s/2 - 2, 0, Math.PI*2);
+          ctx.fillStyle = t.border;
+          ctx.fill();
+        } else if (t.label && cellSize >= 10) {
+          ctx.fillStyle = t.border;
+          ctx.font = `${Math.max(8, cellSize - 4)}px Share Tech Mono`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(t.label, x + s/2, y + s/2 + 1);
+        }
+      }
+    }
+  }
+
+  // Line preview
+  if (linePreview.length) {
+    for (const [pr, pc] of linePreview) {
+      if (pr < 0 || pr >= gridH || pc < 0 || pc >= gridW) continue;
+      const x = offsetX + pc * cellSize;
+      const y = offsetY + pr * cellSize;
+      ctx.fillStyle = 'rgba(34,197,94,0.4)';
+      ctx.fillRect(x, y, cellSize-1, cellSize-1);
+    }
+  }
+
+  // Grid border
+  ctx.strokeStyle = '#22c55e';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(offsetX - 1, offsetY - 1, gridW * cellSize + 2, gridH * cellSize + 2);
+
+  // Faint grid lines if zoom big enough
+  if (cellSize >= 12) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    for (let r = startR; r <= endR; r++) {
+      ctx.beginPath();
+      ctx.moveTo(offsetX + startC * cellSize, offsetY + r * cellSize);
+      ctx.lineTo(offsetX + endC * cellSize, offsetY + r * cellSize);
+      ctx.stroke();
+    }
+    for (let c = startC; c <= endC; c++) {
+      ctx.beginPath();
+      ctx.moveTo(offsetX + c * cellSize, offsetY + startR * cellSize);
+      ctx.lineTo(offsetX + c * cellSize, offsetY + endR * cellSize);
+      ctx.stroke();
+    }
+  }
+
+  // Ruler numbers (row every 5)
+  if (cellSize >= 10) {
+    ctx.fillStyle = '#374151';
+    ctx.font = '9px Share Tech Mono';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let r = 0; r < gridH; r += 5) {
+      ctx.fillText(r, offsetX - 4, offsetY + r * cellSize + cellSize/2);
+    }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    for (let c = 0; c < gridW; c += 10) {
+      ctx.fillText(c, offsetX + c * cellSize + cellSize/2, offsetY - 3);
+    }
+  }
+}
+
+// ===================== COORDS =====================
+function canvasToCell(px, py) {
+  const c = Math.floor((px - offsetX) / cellSize);
+  const r = Math.floor((py - offsetY) / cellSize);
+  return [r, c];
+}
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function inBounds(r, c) { return r >= 0 && r < gridH && c >= 0 && c < gridW; }
+
+// ===================== PAINT =====================
+function paintCell(r, c) {
+  if (!inBounds(r, c)) return;
+  if (grid[r][c] === selectedTile) return;
+  grid[r][c] = selectedTile;
+}
+
+// ===================== FILL =====================
+function floodFill(r, c, target) {
+  if (!inBounds(r, c)) return;
+  if (grid[r][c] === selectedTile) return;
+  if (grid[r][c] !== target) return;
+  const stack = [[r, c]];
+  while (stack.length) {
+    const [cr, cc] = stack.pop();
+    if (!inBounds(cr, cc) || grid[cr][cc] !== target) continue;
+    grid[cr][cc] = selectedTile;
+    stack.push([cr+1,cc],[cr-1,cc],[cr,cc+1],[cr,cc-1]);
+  }
+}
+
+// ===================== LINE TOOL =====================
+function bresenham(r0, c0, r1, c1) {
+  const cells = [];
+  let dr = Math.abs(r1-r0), dc = Math.abs(c1-c0);
+  let sr = r0<r1?1:-1, sc = c0<c1?1:-1;
+  let err = dr - dc;
+  let cr = r0, cc = c0;
+  while (true) {
+    cells.push([cr, cc]);
+    if (cr===r1 && cc===c1) break;
+    let e2 = 2*err;
+    if (e2 > -dc) { err -= dc; cr += sr; }
+    if (e2 < dr)  { err += dr; cc += sc; }
+  }
+  return cells;
+}
+
+// ===================== MOUSE =====================
+let lastPaintR = -1, lastPaintC = -1;
+
+canvas.addEventListener('mousedown', e => {
+  const [r, c] = canvasToCell(e.offsetX, e.offsetY);
+
+  if (e.button === 1 || spaceDown) {
+    isPanning = true;
+    panStartX = e.clientX; panStartY = e.clientY;
+    panStartOX = offsetX; panStartOY = offsetY;
+    e.preventDefault(); return;
+  }
+
+  if (e.button === 0) {
+    if (currentTool === 'fill') {
+      if (!inBounds(r, c)) return;
+      pushUndo();
+      floodFill(r, c, grid[r][c]);
+      render(); return;
+    }
+    if (currentTool === 'line') {
+      if (!lineStart) {
+        lineStart = [r, c];
+        linePreview = [[r, c]];
+      } else {
+        pushUndo();
+        const cells = bresenham(lineStart[0], lineStart[1], r, c);
+        for (const [pr, pc] of cells) { if (inBounds(pr, pc)) grid[pr][pc] = selectedTile; }
+        lineStart = null; linePreview = [];
+        render();
+      }
+      return;
+    }
+    // Paint
+    isPainting = true;
+    pushUndo();
+    paintCell(r, c);
+    lastPaintR = r; lastPaintC = c;
+    render();
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  const [r, c] = canvasToCell(e.offsetX, e.offsetY);
+  if (inBounds(r, c)) {
+    document.getElementById('st-pos').textContent = `${c},${r}`;
+  }
+
+  if (isPanning) {
+    offsetX = panStartOX + (e.clientX - panStartX);
+    offsetY = panStartOY + (e.clientY - panStartY);
+    render(); return;
+  }
+
+  if (currentTool === 'line' && lineStart) {
+    linePreview = inBounds(r, c) ? bresenham(lineStart[0], lineStart[1], r, c) : [lineStart];
+    render(); return;
+  }
+
+  if (isPainting && (r !== lastPaintR || c !== lastPaintC)) {
+    // Interpolate between last and current
+    if (lastPaintR >= 0) {
+      const cells = bresenham(lastPaintR, lastPaintC, r, c);
+      for (const [pr, pc] of cells) paintCell(pr, pc);
+    } else {
+      paintCell(r, c);
+    }
+    lastPaintR = r; lastPaintC = c;
+    render();
+  }
+});
+
+window.addEventListener('mouseup', e => {
+  isPainting = false;
+  isPanning = false;
+  lastPaintR = -1; lastPaintC = -1;
+});
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const [r, c] = canvasToCell(e.offsetX, e.offsetY);
+  const oldSize = cellSize;
+  cellSize = clamp(cellSize + (e.deltaY < 0 ? 2 : -2), 4, 48);
+  // Zoom toward cursor
+  offsetX = e.offsetX - c * cellSize;
+  offsetY = e.offsetY - r * cellSize;
+  document.getElementById('inp-zoom').value = cellSize;
+  document.getElementById('st-zoom').textContent = cellSize + 'px';
+  render();
+}, { passive: false });
+
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+// Space = pan
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' && !e.target.matches('input,textarea')) {
+    spaceDown = true;
+    canvas.style.cursor = 'grab';
+    e.preventDefault();
+  }
+  if (e.ctrlKey && e.key === 'z') { undo(); e.preventDefault(); }
+  // Number shortcuts
+  const map = {'1':'.','2':'#','3':'+','4':'=','5':'|','6':'v','7':'o','8':'@'};
+  if (map[e.key] && !e.target.matches('input,textarea')) selectTile(map[e.key]);
+});
+window.addEventListener('keyup', e => {
+  if (e.code === 'Space') { spaceDown = false; canvas.style.cursor = 'crosshair'; }
+});
+
+// ===================== TILE / TOOL SELECT =====================
+function selectTile(t) {
+  selectedTile = t;
+  document.querySelectorAll('.tile-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tile === t);
+  });
+  document.getElementById('st-tile').textContent = t;
+}
+
+function selectTool(t) {
+  currentTool = t;
+  lineStart = null; linePreview = [];
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    b.classList.toggle('active', b.id === 'tool-' + t);
+  });
+  document.getElementById('st-tool').textContent = t;
+  render();
+}
+
+// ===================== ZOOM =====================
+function setZoom(v) {
+  cellSize = clamp(v, 4, 48);
+  document.getElementById('st-zoom').textContent = cellSize + 'px';
+  render();
+}
+
+// ===================== EXPORT / IMPORT =====================
+function exportLevel() {
+  return grid.map(row => row.join('')).join('\n');
+}
+
+function openExport() {
+  const str = exportLevel();
+  document.getElementById('modal-title').textContent = 'ESPORTA LIVELLO';
+  document.getElementById('modal-hint').textContent = 'Copia questa stringa e incollala nel tuo level.js tra i backtick.';
+  document.getElementById('modal-text').value = str;
+  document.getElementById('modal-action-btn').style.display = 'none';
+  document.getElementById('modal-copy-btn').style.display = '';
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function openImport() {
+  document.getElementById('modal-title').textContent = 'IMPORTA LIVELLO';
+  document.getElementById('modal-hint').textContent = 'Incolla qui il testo di un livello (le righe ASCII) e premi Importa.';
+  document.getElementById('modal-text').value = '';
+  document.getElementById('modal-action-btn').style.display = '';
+  document.getElementById('modal-action-btn').textContent = 'Importa';
+  document.getElementById('modal-action-btn').onclick = doImport;
+  document.getElementById('modal-copy-btn').style.display = 'none';
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function doImport() {
+  const txt = document.getElementById('modal-text').value.trim();
+  const rows = txt.split('\n').map(r => r.split(''));
+  if (!rows.length) return;
+  const newW = Math.max(...rows.map(r => r.length));
+  const newH = rows.length;
+  pushUndo();
+  grid = rows.map(r => {
+    while (r.length < newW) r.push('.');
+    return r;
+  });
+  gridW = newW; gridH = newH;
+  document.getElementById('inp-w').value = gridW;
+  document.getElementById('inp-h').value = gridH;
+  updateStatus();
+  closeModal();
+  render();
+}
+
+function copyToClipboard() {
+  navigator.clipboard.writeText(exportLevel()).then(() => {
+    const btn = document.querySelector('#topbar button:nth-of-type(4)');
+    // simple feedback via status
+    document.getElementById('st-pos').textContent = '✓ copiato!';
+    setTimeout(() => document.getElementById('st-pos').textContent = '-', 1500);
+  });
+}
+
+function copyModal() {
+  const txt = document.getElementById('modal-text').value;
+  navigator.clipboard.writeText(txt).then(() => {
+    document.getElementById('modal-copy-btn').textContent = '✓ Copiato!';
+    setTimeout(() => document.getElementById('modal-copy-btn').textContent = '📋 Copia tutto', 1500);
+  });
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+// ===================== STATUS =====================
+function updateStatus() {
+  document.getElementById('st-size').textContent = `${gridW}×${gridH}`;
+  document.getElementById('st-zoom').textContent = cellSize + 'px';
+}
+
+// ===================== INIT =====================
+window.addEventListener('resize', fitCanvas);
+fitCanvas();
+initGrid(80, 25);
+
+// Center grid on start
+offsetX = Math.max(40, (canvas.width - gridW * cellSize) / 2);
+offsetY = Math.max(40, (canvas.height - gridH * cellSize) / 2);
+render();
+</script>
+</body>
+</html>
