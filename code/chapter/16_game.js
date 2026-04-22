@@ -12,11 +12,11 @@ var simpleLevelPlan = `
  if (chiedi=="s"){
 
  var sndmorto= new Audio();
- sndmorto.src='G:\download\puzzleny\17_canvas\17canvas\morto.wav';
+ sndmorto.src='morto.wav';
  var snd= new Audio();
- snd.src='G:\download\puzzleny\17_canvas\17canvas\soldi.wav';
+ snd.src='soldi.wav';
  var sndsalto= new Audio();
- sndsalto.src='G:\download\puzzleny\17_canvas\17canvas\salto.wav';
+ sndsalto.src='salto.wav';
  }
 var Level = class Level {
   constructor(plan) {
