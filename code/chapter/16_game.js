@@ -319,10 +319,12 @@ Player.prototype.update = function(time, state, keys) {
   if (!state.level.touches(movedY, this.size, "wall")) {
     pos = movedY;
   } else if (keys.ArrowUp && ySpeed > 0) {
+	sndsalto.play();  
     ySpeed = -jumpSpeed;
   } else {
     ySpeed = 0;
   }
+  sndsalto.pause();	
   return new Player(pos, new Vec(xSpeed, ySpeed));
 };
 
