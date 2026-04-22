@@ -291,10 +291,19 @@ var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
   
-  sndcorri.play()
+  
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
+
+  if (sndcorri) {
+    if (xSpeed !== 0 && sndcorri.paused) {
+      sndcorri.play();
+    } else if (xSpeed === 0 && !sndcorri.paused) {
+      sndcorri.pause();
+      sndcorri.currentTime = 0;
+    }
+  }
   let pos = this.pos;
   let movedX = pos.plus(new Vec(xSpeed * time, 0));
   if (!state.level.touches(movedX, this.size, "wall")) {
