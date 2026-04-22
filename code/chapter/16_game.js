@@ -23,7 +23,7 @@ var simpleLevelPlan = `
  var snd= new Audio();
  snd.src='soldi.wav';
  var sndsalto= new Audio();
- sndsalto.src='salto.wav';
+ sndsalto.src='salta.wav';
  }
 var Level = class Level {
   constructor(plan) {
