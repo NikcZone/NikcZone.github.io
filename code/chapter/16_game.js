@@ -16,15 +16,14 @@ var simpleLevelPlan = `
  sndcorri.src='corri_.wav';
  sndcorri.loop = true;
  sndcorri.addEventListener('timeupdate', function() {
-   if (sndcorri.currentTime > 0.1) sndcorri.currentTime = 0;
+   if (sndcorri.currentTime > 0.4) sndcorri.currentTime = 0;
  });
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
  var snd= new Audio();
  snd.src='soldi.wav';
  var sndsalto= new Audio();
- sndsalto.src='salto.wav'; 
- 
+ sndsalto.src='salto.wav';
  }
 var Level = class Level {
   constructor(plan) {
