@@ -9,14 +9,17 @@ var simpleLevelPlan = `
 ......##############..
 ......................`;
  var chiedi=prompt("Attivare audio[s\n]")
+ var corriPlaying = false;
  if (chiedi=="s"){
 
-  
+ var sndcorri=new Audio();
+ sndcorri.src='corri_.wav';	 
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
  var snd= new Audio();
  snd.src='soldi.wav';
- 
+ var sndsalto= new Audio();
+ sndsalto.src='salto.wav';
  }
 var Level = class Level {
   constructor(plan) {
@@ -251,12 +254,12 @@ function overlap(actor1, actor2) {
 }
 
 Lava.prototype.collide = function(state) {
-  sndmorto.play();
+	 if (sndmorto) sndmorto.play().catch(() => {});
   return new State(state.level, state.actors, "lost");
 };
 
 Coin.prototype.collide = function(state) {
-  snd.play()
+  if (snd) snd.play().catch(() => {});
   let filtered = state.actors.filter(a => a != this);
   let status = state.status;
   if (!filtered.some(a => a.type == "coin")) status = "won";
@@ -288,24 +291,24 @@ var gravity = 30;
 var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
-  var sndsalto= new Audio();
-  sndsalto.src='salto.wav';
-  var sndcorri=new Audio();
-  sndcorri.src='corri_.wav';
+  
+  
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
 
   if (sndcorri) {
-    if (xSpeed !== 0 && sndcorri.paused) {
-      sndcorri.play();
-    } else if (xSpeed === 0 && !sndcorri.paused) {
+    if (xSpeed !== 0 && !corriPlaying) {
+      corriPlaying = true;
+      sndcorri.currentTime = 0;
+      sndcorri.play().catch(() => { corriPlaying = false; });
+    } else if (xSpeed === 0 && corriPlaying) {
+      corriPlaying = false;
       sndcorri.pause();
       sndcorri.currentTime = 0;
     }
   }
   let pos = this.pos;
-  let status = state.status;
   let movedX = pos.plus(new Vec(xSpeed * time, 0));
   if (!state.level.touches(movedX, this.size, "wall")) {
     pos = movedX;
@@ -316,10 +319,8 @@ Player.prototype.update = function(time, state, keys) {
   if (!state.level.touches(movedY, this.size, "wall")) {
     pos = movedY;
   } else if (keys.ArrowUp && ySpeed > 0) {
-    sndsalto.play();
     ySpeed = -jumpSpeed;
   } else {
-    sndsalto.pause();
     ySpeed = 0;
   }
   return new Player(pos, new Vec(xSpeed, ySpeed));
