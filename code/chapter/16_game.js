@@ -16,7 +16,7 @@ var simpleLevelPlan = `
  sndcorri.src='corri_.wav';
  sndcorri.loop = true;
  sndcorri.addEventListener('timeupdate', function() {
-   if (sndcorri.currentTime > 0.4) sndcorri.currentTime = 0;
+   if (sndcorri.currentTime > 0.8) sndcorri.currentTime = 0;
  });
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
@@ -334,6 +334,7 @@ Player.prototype.update = function(time, state, keys) {
   if (!state.level.touches(movedY, this.size, "wall")) {
     pos = movedY;
   } else if (keys.ArrowUp && ySpeed > 0) {
+    sndsalto.play().catch(() => {});
     ySpeed = -jumpSpeed;
   } else {
     ySpeed = 0;
