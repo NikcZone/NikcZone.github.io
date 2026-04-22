@@ -150,8 +150,8 @@ function updateUI(){
 
     mood = Math.max(0, Math.min(100, mood));
 
-    let color = "green";
-    if(mood < 40) color = "red";
+    let color = "red";
+    if(mood < 40) color = "green";
     else if(mood < 70) color = "orange";
 
     result.style.background = color;
