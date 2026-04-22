@@ -258,7 +258,7 @@ Lava.prototype.collide = function(state) {
 };
 
 Coin.prototype.collide = function(state) {
-	snd.play()
+  snd.play()
   let filtered = state.actors.filter(a => a != this);
   let status = state.status;
   if (!filtered.some(a => a.type == "coin")) status = "won";
@@ -291,7 +291,7 @@ var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
   
-  sndcorri.play();
+  sndcorri.play()
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
