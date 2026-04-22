@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Global Mood AI FINAL</title>
+<title>Global Mood AI FULL</title>
 
 <style>
 body { background:#0f172a; color:white; font-family:Arial; padding:20px; }
@@ -37,9 +37,9 @@ canvas {
 
 <div class="container">
 
-<h1>🌍 Global Mood AI FINAL</h1>
+<h1>🌍 Global Mood AI FULL</h1>
 
-<button onclick="loadScenario('current')">Scenario attuale</button>
+<button onclick="loadScenario('current')">Attuale</button>
 <button onclick="loadScenario('green')">Green</button>
 <button onclick="loadScenario('crisis')">Crisi</button>
 
@@ -51,8 +51,20 @@ canvas {
 <div class="slider">Temperatura <span id="temp_val"></span>
 <input id="temp" type="range" min="0.5" max="3" step="0.1"></div>
 
+<div class="slider">Eventi estremi <span id="events_val"></span>
+<input id="events" type="range" min="0" max="100"></div>
+
+<div class="slider">Fossili <span id="fossil_val"></span>
+<input id="fossil" type="range" min="0" max="100"></div>
+
+<div class="slider">Prezzo cibo <span id="food_val"></span>
+<input id="food" type="range" min="80" max="200"></div>
+
 <div class="slider">Conflitti <span id="conflict_val"></span>
 <input id="conflict" type="range" min="0" max="100"></div>
+
+<div class="slider">Disuguaglianza <span id="ineq_val"></span>
+<input id="ineq" type="range" min="0.2" max="0.7" step="0.01"></div>
 
 <button onclick="simulate()">Simula 20 anni</button>
 
@@ -78,15 +90,21 @@ let model = null;
 
 // ===== LOAD MODEL =====
 async function loadModel(){
-    let res = await fetch("model.json");
-    model = await res.json();
+    try {
+        let res = await fetch("model.json");
+        model = await res.json();
+    } catch(e) {
+        console.log("fallback attivo");
+    }
 }
 
 // ===== ACTIVATION =====
 function relu(x){ return Math.max(0,x); }
 
-// ===== NN =====
+// ===== AI MODEL =====
 function runModel(input){
+
+    if(!model) return fallbackModel(input);
 
     let [w1,b1,w2,b2] = model;
 
@@ -108,16 +126,28 @@ function runModel(input){
     return out[0];
 }
 
+// ===== FALLBACK MODEL =====
+function fallbackModel([co2,temp,events,fossil,food,conflict,ineq]){
+
+    let climate = temp*40 + (co2-400)*0.1;
+    let stress = conflict*1.2 + events*0.8 + (food-100)*0.5;
+    let system = fossil*0.5 + ineq*100;
+
+    let mood = 100 - (climate*0.3 + stress*0.3 + system*0.2);
+
+    return mood;
+}
+
 // ===== UPDATE UI =====
 function updateUI(){
 
-    if(!model) return;
+    let data = getData();
 
-    let co2 = +co2_el.value;
-    let temp = +temp_el.value;
-    let conflict = +conflict_el.value;
+    let mood = runModel([
+        data.co2,data.temp,data.events,
+        data.fossil,data.food,data.conflict,data.ineq
+    ]);
 
-    let mood = runModel([co2,temp,conflict]);
     mood = Math.max(0, Math.min(100, mood));
 
     let color = "green";
@@ -125,16 +155,33 @@ function updateUI(){
     else if(mood < 70) color = "orange";
 
     result.style.background = color;
-    result.innerText = "Mood AI: " + mood.toFixed(1);
+    result.innerText = "Mood: " + mood.toFixed(1);
 
     updateLabels();
 }
 
+// ===== DATA =====
+function getData(){
+    return {
+        co2:+co2.value,
+        temp:+temp.value,
+        events:+events.value,
+        fossil:+fossil.value,
+        food:+food.value,
+        conflict:+conflict.value,
+        ineq:+ineq.value
+    };
+}
+
 // ===== LABELS =====
 function updateLabels(){
-    co2_val.innerText = co2_el.value;
-    temp_val.innerText = temp_el.value;
-    conflict_val.innerText = conflict_el.value;
+    co2_val.innerText = co2.value;
+    temp_val.innerText = temp.value;
+    events_val.innerText = events.value;
+    fossil_val.innerText = fossil.value;
+    food_val.innerText = food.value;
+    conflict_val.innerText = conflict.value;
+    ineq_val.innerText = ineq.value;
 }
 
 // ===== SIMULATION =====
@@ -142,26 +189,24 @@ let history = { mood:[], climate:[], conflict:[] };
 
 function simulate(){
 
-    let co2 = +co2_el.value;
-    let temp = +temp_el.value;
-    let conflict = +conflict_el.value;
-
+    let d = getData();
     history = { mood:[], climate:[], conflict:[] };
 
     for(let i=0;i<20;i++){
 
-        co2 += 5;
-        temp += 0.05;
-        conflict += 1;
+        d.co2 += d.fossil*0.2;
+        d.temp += d.co2*0.0003;
+        d.events += d.temp*1.5;
+        d.food += d.events*0.2;
+        d.conflict += (d.food/150) + d.ineq*2;
 
-        let mood = runModel([co2,temp,conflict]);
-        mood = Math.max(0, Math.min(100, mood));
-
-        let climate = temp * 40;
+        let mood = runModel([
+            d.co2,d.temp,d.events,d.fossil,d.food,d.conflict,d.ineq
+        ]);
 
         history.mood.push(mood);
-        history.climate.push(climate);
-        history.conflict.push(conflict);
+        history.climate.push(d.temp*40);
+        history.conflict.push(d.conflict);
     }
 
     drawChart();
@@ -177,11 +222,9 @@ function drawChart(){
     function draw(data,scale,color){
         ctx.beginPath();
         ctx.moveTo(0,300-data[0]*scale);
-
         for(let i=1;i<data.length;i++){
             ctx.lineTo(i*40,300-data[i]*scale);
         }
-
         ctx.strokeStyle=color;
         ctx.stroke();
     }
@@ -201,7 +244,7 @@ function analyze(){
     let txt = "<b>Analisi:</b><br>";
 
     if(history.mood[19] < history.mood[0])
-        txt += "🔻 Peggioramento globale<br>";
+        txt += "🔻 Peggioramento<br>";
     else
         txt += "🟢 Miglioramento<br>";
 
@@ -218,34 +261,25 @@ function analyze(){
 function loadScenario(type){
 
     if(type==="current"){
-        co2_el.value=420;
-        temp_el.value=1.2;
-        conflict_el.value=40;
+        co2.value=420; temp.value=1.2; events.value=50;
+        fossil.value=65; food.value=120; conflict.value=40; ineq.value=0.4;
     }
 
     if(type==="green"){
-        co2_el.value=380;
-        temp_el.value=1.0;
-        conflict_el.value=20;
+        co2.value=380; temp.value=1.0; events.value=40;
+        fossil.value=30; food.value=100; conflict.value=20; ineq.value=0.3;
     }
 
     if(type==="crisis"){
-        co2_el.value=500;
-        temp_el.value=2.2;
-        conflict_el.value=70;
+        co2.value=500; temp.value=2.2; events.value=80;
+        fossil.value=85; food.value=160; conflict.value=70; ineq.value=0.6;
     }
 
     updateUI();
 }
 
 // ===== INIT =====
-let co2_el,temp_el,conflict_el;
-
 window.onload = async () => {
-
-    co2_el = document.getElementById("co2");
-    temp_el = document.getElementById("temp");
-    conflict_el = document.getElementById("conflict");
 
     await loadModel();
 
