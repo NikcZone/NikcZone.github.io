@@ -13,13 +13,14 @@ var simpleLevelPlan = `
  if (chiedi=="s"){
 
  var sndcorri=new Audio();
- sndcorri.src='corri_.wav';	 
+ sndcorri.src='corri_.wav';
+ sndcorri.loop = true;
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
  var snd= new Audio();
  snd.src='soldi.wav';
  var sndsalto= new Audio();
- sndsalto.src='salta.wav';
+ sndsalto.src='salto.wav';
  }
 var Level = class Level {
   constructor(plan) {
@@ -254,7 +255,12 @@ function overlap(actor1, actor2) {
 }
 
 Lava.prototype.collide = function(state) {
-	 if (sndmorto) sndmorto.play().catch(() => {});
+  if (sndcorri && corriPlaying) {
+    corriPlaying = false;
+    sndcorri.pause();
+    sndcorri.currentTime = 0;
+  }
+  if (sndmorto) sndmorto.play().catch(() => {});
   return new State(state.level, state.actors, "lost");
 };
 
@@ -319,12 +325,10 @@ Player.prototype.update = function(time, state, keys) {
   if (!state.level.touches(movedY, this.size, "wall")) {
     pos = movedY;
   } else if (keys.ArrowUp && ySpeed > 0) {
-	sndsalto.play();  
     ySpeed = -jumpSpeed;
   } else {
     ySpeed = 0;
   }
-  
   return new Player(pos, new Vec(xSpeed, ySpeed));
 };
 
