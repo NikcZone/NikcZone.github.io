@@ -324,7 +324,7 @@ Player.prototype.update = function(time, state, keys) {
   } else {
     ySpeed = 0;
   }
-  sndsalto.pause();	
+  
   return new Player(pos, new Vec(xSpeed, ySpeed));
 };
 
