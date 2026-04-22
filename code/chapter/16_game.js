@@ -11,8 +11,7 @@ var simpleLevelPlan = `
  var chiedi=prompt("Attivare audio[s\n]")
  if (chiedi=="s"){
 
- var sndcorri=new Audio();
- sndcorri.src='corri_.wav';	 
+ 	 
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
  var snd= new Audio();
@@ -253,7 +252,7 @@ function overlap(actor1, actor2) {
 }
 
 Lava.prototype.collide = function(state) {
-	 sndmorto.play();
+  sndmorto.play();
   return new State(state.level, state.actors, "lost");
 };
 
@@ -291,7 +290,8 @@ var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
   
-  
+  var sndcorri=new Audio();
+  sndcorri.src='corri_.wav';
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
