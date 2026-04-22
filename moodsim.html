@@ -148,7 +148,7 @@ function updateUI(){
         data.fossil,data.food,data.conflict,data.ineq
     ]);
 
-    mood = 100 - Math.max(0, Math.min(100, mood));
+    mood =  Math.max(0, Math.min(100, mood));
 
     let color = "green";
     if(mood < 40) color = "red";
