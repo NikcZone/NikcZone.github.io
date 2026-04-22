@@ -324,6 +324,7 @@ Player.prototype.update = function(time, state, keys) {
       sndcorri.currentTime = 0;
     }
   }
+
   let pos = this.pos;
   let movedX = pos.plus(new Vec(xSpeed * time, 0));
   if (!state.level.touches(movedX, this.size, "wall")) {
@@ -335,13 +336,11 @@ Player.prototype.update = function(time, state, keys) {
   if (!state.level.touches(movedY, this.size, "wall")) {
     pos = movedY;
   } else if (keys.ArrowUp && ySpeed > 0) {
-    
+    if (sndsalto) { sndsalto.currentTime = 0; sndsalto.play().catch(() => {}); }
     ySpeed = -jumpSpeed;
   } else {
     ySpeed = 0;
-    
   }
-  
   return new Player(pos, new Vec(xSpeed, ySpeed));
 };
 
