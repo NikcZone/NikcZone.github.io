@@ -73,7 +73,7 @@ CanvasDisplay.prototype.clearDisplay = function(status) {
 };
 
 var otherSprites = document.createElement("img");
-otherSprites.src = "img/sprites.png";
+otherSprites.src = "sprites.png";
 
 CanvasDisplay.prototype.drawBackground = function(level) {
   let {left, top, width, height} = this.viewport;
@@ -97,7 +97,7 @@ CanvasDisplay.prototype.drawBackground = function(level) {
 };
 
 var playerSprites = document.createElement("img");
-playerSprites.src = "img/player.png";
+playerSprites.src = "player.png";
 var playerXOverlap = 4;
 
 CanvasDisplay.prototype.drawPlayer = function(player, x, y,
