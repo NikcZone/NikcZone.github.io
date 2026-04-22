@@ -289,8 +289,8 @@ var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
   var sndcorri=new Audio();
- sndcorri.src='G:/download/puzzleny/17_canvas/Phone Beep.ogg';
-  sndcorri.play();
+ sndcorri.src='Phone Beep.ogg';
+  sndcorri.play()
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
