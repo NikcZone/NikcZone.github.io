@@ -2,45 +2,33 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Global Mood Simulator PRO v3</title>
+<title>Global Mood AI FINAL</title>
+
 <style>
-body {
-    font-family: Arial;
-    background: #0f172a;
-    color: #e2e8f0;
-    padding: 20px;
-}
-.container { max-width: 900px; margin: auto; }
-h1 { color: #38bdf8; }
+body { background:#0f172a; color:white; font-family:Arial; padding:20px; }
+.container { max-width:900px; margin:auto; }
+.slider { margin-bottom:10px; }
+input { width:100%; }
 
-.slider-box { margin-bottom: 10px; }
-input[type=range] { width: 100%; }
-
-.output {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 22px;
-}
-
-button {
-    margin: 4px;
-    padding: 6px 10px;
-    cursor: pointer;
+#result {
+    margin-top:20px;
+    padding:15px;
+    border-radius:10px;
+    font-size:22px;
+    text-align:center;
 }
 
 canvas {
-    background: #020617;
-    margin-top: 20px;
-    border-radius: 10px;
+    background:#020617;
+    margin-top:20px;
+    border-radius:10px;
 }
 
-#advice, #analysis, #explanation {
-    margin-top: 10px;
-    padding: 10px;
-    background: #1e293b;
-    border-radius: 8px;
+.box {
+    margin-top:10px;
+    padding:10px;
+    background:#1e293b;
+    border-radius:8px;
 }
 </style>
 </head>
@@ -48,62 +36,35 @@ canvas {
 <body>
 
 <div class="container">
-<h1>🌍 Global Mood Simulator PRO v3</h1>
 
-<p style="font-size:12px;color:#94a3b8;">
-Modello divulgativo semplificato (non predittivo)
-</p>
+<h1>🌍 Global Mood AI FINAL</h1>
 
 <button onclick="loadScenario('current')">Scenario attuale</button>
-<button onclick="loadScenario('green')">Transizione verde</button>
-<button onclick="loadScenario('crisis')">Crisi globale</button>
-
-<button onclick="eventWar()">⚔️ Guerra</button>
-<button onclick="eventGreen()">🌱 Accordo clima</button>
-<button onclick="eventFood()">🍞 Crisi alimentare</button>
+<button onclick="loadScenario('green')">Green</button>
+<button onclick="loadScenario('crisis')">Crisi</button>
 
 <hr>
 
-<div class="slider-box">CO2: <span id="co2_val"></span>
-<input type="range" id="co2" min="350" max="600"></div>
+<div class="slider">CO2 <span id="co2_val"></span>
+<input id="co2" type="range" min="350" max="600"></div>
 
-<div class="slider-box">Temperatura: <span id="temp_val"></span>
-<input type="range" id="temp" min="0.5" max="3" step="0.1"></div>
+<div class="slider">Temperatura <span id="temp_val"></span>
+<input id="temp" type="range" min="0.5" max="3" step="0.1"></div>
 
-<div class="slider-box">Eventi estremi: <span id="events_val"></span>
-<input type="range" id="events" min="0" max="100"></div>
+<div class="slider">Conflitti <span id="conflict_val"></span>
+<input id="conflict" type="range" min="0" max="100"></div>
 
-<div class="slider-box">Fossili: <span id="fossil_val"></span>
-<input type="range" id="fossil" min="0" max="100"></div>
+<button onclick="simulate()">Simula 20 anni</button>
 
-<div class="slider-box">Prezzo cibo: <span id="food_val"></span>
-<input type="range" id="food" min="80" max="200"></div>
+<div id="result"></div>
 
-<div class="slider-box">Conflitti: <span id="conflict_val"></span>
-<input type="range" id="conflict" min="0" max="100"></div>
+<div class="box" id="analysis"></div>
 
-<div class="slider-box">Disuguaglianza: <span id="ineq_val"></span>
-<input type="range" id="ineq" min="0.2" max="0.7" step="0.01"></div>
-
-<button onclick="simulateYears(20)">Simula 20 anni</button>
-<button onclick="exportCSV()">Esporta CSV</button>
-
-<div id="result" class="output"></div>
-
-<div id="advice"></div>
-<div id="analysis"></div>
-
-<div id="legend">
-    <span style="color:lime;">■ Mood globale</span> |
-    <span style="color:red;">■ Stress climatico</span> |
-    <span style="color:orange;">■ Conflitti</span>
-</div>
-
-<div id="explanation">
-<b>Significato:</b><br>
-- Mood globale: stato complessivo del sistema<br>
-- Stress climatico: pressione ambientale<br>
-- Conflitti: instabilità geopolitica
+<div class="box">
+<b>Legenda:</b><br>
+<span style="color:lime;">■ Mood</span> |
+<span style="color:red;">■ Clima</span> |
+<span style="color:orange;">■ Conflitti</span>
 </div>
 
 <canvas id="chart" width="800" height="300"></canvas>
@@ -112,83 +73,188 @@ Modello divulgativo semplificato (non predittivo)
 
 <script>
 
-let history = { mood: [], climate: [], conflict: [] };
+// ===== MODEL =====
+let model = null;
 
-function updateLabels() {
-    co2_val.innerText = co2.value;
-    temp_val.innerText = temp.value;
+// ===== LOAD MODEL =====
+async function loadModel(){
+    let res = await fetch("model.json");
+    model = await res.json();
 }
 
-function currentData() {
-    return {
-        co2: +co2.value,
-        temp: +temp.value,
-        events: +events.value,
-        fossil: +fossil.value,
-        food: +food.value,
-        conflict: +conflict.value,
-        ineq: +ineq.value
-    };
+// ===== ACTIVATION =====
+function relu(x){ return Math.max(0,x); }
+
+// ===== NN =====
+function runModel(input){
+
+    let [w1,b1,w2,b2] = model;
+
+    function layer(x,w,b,act=true){
+        let out=[];
+        for(let i=0;i<w.length;i++){
+            let sum=b[i];
+            for(let j=0;j<x.length;j++){
+                sum += x[j]*w[i][j];
+            }
+            out.push(act ? relu(sum) : sum);
+        }
+        return out;
+    }
+
+    let l1 = layer(input,w1,b1);
+    let out = layer(l1,w2,b2,false);
+
+    return out[0];
 }
 
-function computeMood(data) {
-    let climate = Math.pow(data.temp, 2) * 30;
-    let conflict = Math.pow(data.conflict / 50, 2) * 100;
-    let mood = 100 - (climate*0.3 + conflict*0.3);
-    return { mood, climate, conflict };
+// ===== UPDATE UI =====
+function updateUI(){
+
+    if(!model) return;
+
+    let co2 = +co2_el.value;
+    let temp = +temp_el.value;
+    let conflict = +conflict_el.value;
+
+    let mood = runModel([co2,temp,conflict]);
+    mood = Math.max(0, Math.min(100, mood));
+
+    let color = "green";
+    if(mood < 40) color = "red";
+    else if(mood < 70) color = "orange";
+
+    result.style.background = color;
+    result.innerText = "Mood AI: " + mood.toFixed(1);
+
+    updateLabels();
 }
 
-function simulateYears(n) {
-    let data = currentData();
-    history = { mood: [], climate: [], conflict: [] };
+// ===== LABELS =====
+function updateLabels(){
+    co2_val.innerText = co2_el.value;
+    temp_val.innerText = temp_el.value;
+    conflict_val.innerText = conflict_el.value;
+}
 
-    for (let i = 0; i < n; i++) {
-        let res = computeMood(data);
-        history.mood.push(res.mood);
-        history.climate.push(res.climate);
-        history.conflict.push(res.conflict);
+// ===== SIMULATION =====
+let history = { mood:[], climate:[], conflict:[] };
+
+function simulate(){
+
+    let co2 = +co2_el.value;
+    let temp = +temp_el.value;
+    let conflict = +conflict_el.value;
+
+    history = { mood:[], climate:[], conflict:[] };
+
+    for(let i=0;i<20;i++){
+
+        co2 += 5;
+        temp += 0.05;
+        conflict += 1;
+
+        let mood = runModel([co2,temp,conflict]);
+        mood = Math.max(0, Math.min(100, mood));
+
+        let climate = temp * 40;
+
+        history.mood.push(mood);
+        history.climate.push(climate);
+        history.conflict.push(conflict);
     }
 
     drawChart();
+    analyze();
 }
 
-function drawChart() {
+// ===== CHART =====
+function drawChart(){
+
     let ctx = chart.getContext("2d");
     ctx.clearRect(0,0,800,300);
 
-    function drawLine(data, scale, color) {
+    function draw(data,scale,color){
         ctx.beginPath();
-        ctx.moveTo(0, 300 - data[0]*scale);
-        for (let i = 1; i < data.length; i++) {
-            ctx.lineTo(i*20, 300 - data[i]*scale);
+        ctx.moveTo(0,300-data[0]*scale);
+
+        for(let i=1;i<data.length;i++){
+            ctx.lineTo(i*40,300-data[i]*scale);
         }
-        ctx.strokeStyle = color;
+
+        ctx.strokeStyle=color;
         ctx.stroke();
     }
 
-    drawLine(history.mood, 2, "lime");
-    drawLine(history.climate, 1, "red");
-    drawLine(history.conflict, 2, "orange");
+    draw(history.mood,3,"lime");
+    draw(history.climate,1,"red");
+    draw(history.conflict,2,"orange");
+
+    ctx.fillStyle="lime"; ctx.fillText("Mood",10,20);
+    ctx.fillStyle="red"; ctx.fillText("Clima",10,40);
+    ctx.fillStyle="orange"; ctx.fillText("Conflitti",10,60);
 }
 
-function loadScenario() {
-    co2.value = 420;
-    temp.value = 1.2;
+// ===== ANALYSIS =====
+function analyze(){
+
+    let txt = "<b>Analisi:</b><br>";
+
+    if(history.mood[19] < history.mood[0])
+        txt += "🔻 Peggioramento globale<br>";
+    else
+        txt += "🟢 Miglioramento<br>";
+
+    if(history.climate[19] > 80)
+        txt += "🔥 Stress climatico alto<br>";
+
+    if(history.conflict[19] > 70)
+        txt += "⚔️ Conflitti elevati<br>";
+
+    analysis.innerHTML = txt;
 }
 
-function exportCSV() {
-    let csv = "year,mood\n";
-    for (let i = 0; i < history.mood.length; i++) {
-        csv += i + "," + history.mood[i] + "\n";
+// ===== SCENARI =====
+function loadScenario(type){
+
+    if(type==="current"){
+        co2_el.value=420;
+        temp_el.value=1.2;
+        conflict_el.value=40;
     }
-    let blob = new Blob([csv]);
-    let a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "simulation.csv";
-    a.click();
+
+    if(type==="green"){
+        co2_el.value=380;
+        temp_el.value=1.0;
+        conflict_el.value=20;
+    }
+
+    if(type==="crisis"){
+        co2_el.value=500;
+        temp_el.value=2.2;
+        conflict_el.value=70;
+    }
+
+    updateUI();
 }
 
-loadScenario();
+// ===== INIT =====
+let co2_el,temp_el,conflict_el;
+
+window.onload = async () => {
+
+    co2_el = document.getElementById("co2");
+    temp_el = document.getElementById("temp");
+    conflict_el = document.getElementById("conflict");
+
+    await loadModel();
+
+    document.querySelectorAll("input").forEach(el=>{
+        el.addEventListener("input", updateUI);
+    });
+
+    loadScenario("current");
+};
 
 </script>
 
