@@ -16,7 +16,7 @@ var simpleLevelPlan = `
  sndcorri.src='corri_.wav';
  sndcorri.loop = true;
  sndcorri.addEventListener('timeupdate', function() {
-   if (sndcorri.currentTime > 0.1) sndcorri.currentTime = 0;
+   if (sndcorri.currentTime > 0.4) sndcorri.currentTime = 0;
  });
  var sndmorto= new Audio();
  sndmorto.src='morto.wav';
