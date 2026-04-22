@@ -305,6 +305,7 @@ Player.prototype.update = function(time, state, keys) {
     }
   }
   let pos = this.pos;
+  let status = state.status;
   let movedX = pos.plus(new Vec(xSpeed * time, 0));
   if (!state.level.touches(movedX, this.size, "wall")) {
     pos = movedX;
