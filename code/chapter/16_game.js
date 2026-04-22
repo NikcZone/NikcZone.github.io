@@ -16,8 +16,7 @@ var simpleLevelPlan = `
  sndmorto.src='morto.wav';
  var snd= new Audio();
  snd.src='soldi.wav';
- var sndsalto= new Audio();
- sndsalto.src='salto.wav';
+ 
  }
 var Level = class Level {
   constructor(plan) {
@@ -289,7 +288,8 @@ var gravity = 30;
 var jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
-  
+  var sndsalto= new Audio();
+  sndsalto.src='salto.wav';
   var sndcorri=new Audio();
   sndcorri.src='corri_.wav';
   let xSpeed = 0;
