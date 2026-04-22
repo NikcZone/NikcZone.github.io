@@ -291,7 +291,7 @@ var jumpSpeed = 17;
 Player.prototype.update = function(time, state, keys) {
   
   var sndcorri=new Audio();
-  sndcorri.src='corri.wav';
+  sndcorri.src='corri_.wav';
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
