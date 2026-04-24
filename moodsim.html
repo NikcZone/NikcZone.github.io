@@ -37,7 +37,7 @@ canvas {
 
 <div class="container">
 
-<h1>🌍 Global Mood AI FULL</h1>
+<h1>ðŸŒ Global Mood AI FULL</h1>
 
 <button onclick="loadScenario('current')">Attuale</button>
 <button onclick="loadScenario('green')">Green</button>
@@ -74,9 +74,9 @@ canvas {
 
 <div class="box">
 <b>Legenda:</b><br>
-<span style="color:lime;">■ Mood</span> |
-<span style="color:red;">■ Clima</span> |
-<span style="color:orange;">■ Conflitti</span>
+<span style="color:lime;">â–  Mood</span> |
+<span style="color:red;">â–  Clima</span> |
+<span style="color:orange;">â–  Conflitti</span>
 </div>
 
 <canvas id="chart" width="800" height="300"></canvas>
@@ -123,7 +123,7 @@ function runModel(input){
     let l1 = layer(input,w1,b1);
     let out = layer(l1,w2,b2,false);
 
-    return out[0];
+    return 100 - out[0];
 }
 
 // ===== FALLBACK MODEL =====
@@ -148,7 +148,7 @@ function updateUI(){
         data.fossil,data.food,data.conflict,data.ineq
     ]);
 
-    mood =  Math.max(0, Math.min(100, mood));
+    mood = Math.max(0, Math.min(100, mood));
 
     let color = "green";
     if(mood < 40) color = "red";
@@ -244,15 +244,15 @@ function analyze(){
     let txt = "<b>Analisi:</b><br>";
 
     if(history.mood[19] < history.mood[0])
-        txt += "🔻 Peggioramento<br>";
+        txt += "ðŸ”» Peggioramento<br>";
     else
-        txt += "🟢 Miglioramento<br>";
+        txt += "ðŸŸ¢ Miglioramento<br>";
 
     if(history.climate[19] > 80)
-        txt += "🔥 Stress climatico alto<br>";
+        txt += "ðŸ”¥ Stress climatico alto<br>";
 
     if(history.conflict[19] > 70)
-        txt += "⚔️ Conflitti elevati<br>";
+        txt += "âš”ï¸ Conflitti elevati<br>";
 
     analysis.innerHTML = txt;
 }
