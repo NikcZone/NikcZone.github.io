@@ -552,7 +552,18 @@
     </div>
   </article>
 </section>
+<span id="download-count">...</span> 
 
+    <script>
+      fetch('https://api.github.com/repos/NikcZone/bt-monitor/releases')
+        .then(res => res.json())
+        .then(releases => {
+          const count = releases
+            .flatMap(r => r.assets)
+            .reduce((sum, a) => sum + a.download_count, 0);
+          document.getElementById('download-count').textContent = count;
+        });
+    </script>
 <footer>
   <span style="color:var(--muted)">—</span> &nbsp; nikczone.github.io &nbsp; <span style="color:var(--muted)">—</span>
 </footer>
