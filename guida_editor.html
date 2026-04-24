@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Guida Level Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #22c55e;
+    --green-dim: #166534;
+    --yellow: #facc15;
+    --blue: #3b82f6;
+    --red: #ef4444;
+    --orange: #ea580c;
+    --bg: #0d0d0d;
+    --bg2: #111;
+    --bg3: #1a1a1a;
+    --border: #1f2937;
+    --text: #e2e8f0;
+    --muted: #6b7280;
+    --dim: #374151;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    line-height: 1.7;
+    padding: 0 0 80px;
+  }
+
+  /* HERO */
+  #hero {
+    background: var(--bg2);
+    border-bottom: 2px solid var(--green);
+    padding: 48px 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.3;
+  }
+  #hero > * { position: relative; }
+  #hero h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    color: var(--green);
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+  }
+  #hero p { color: var(--muted); font-size: 13px; max-width: 600px; }
+  .version { display: inline-block; background: var(--green-dim); color: var(--green); font-size: 9px; padding: 2px 8px; margin-left: 12px; vertical-align: middle; font-family: 'Press Start 2P', monospace; }
+
+  /* NAV */
+  #nav {
+    position: sticky;
+    top: 0;
+    background: rgba(13,13,13,0.95);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    z-index: 50;
+    backdrop-filter: blur(8px);
+    overflow-x: auto;
+  }
+  #nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 11px;
+    padding: 12px 16px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  #nav a:hover { color: var(--green); border-bottom-color: var(--green-dim); }
+
+  /* CONTENT */
+  .content { max-width: 860px; margin: 0 auto; padding: 0 40px; }
+
+  /* SECTION */
+  .section {
+    margin-top: 56px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .section:first-child { border-top: none; }
+  .section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: var(--green);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--green-dim);
+    opacity: 0.4;
+  }
+  .section-num {
+    background: var(--green-dim);
+    color: var(--green);
+    font-size: 8px;
+    padding: 2px 7px;
+    font-family: 'Press Start 2P', monospace;
+  }
+
+  p { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  p b, p strong { color: var(--text); }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 12px; margin: 18px 0; }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    transition: border-color 0.15s;
+  }
+  .step:hover { border-color: var(--dim); }
+  .step-n {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: var(--green);
+    background: var(--green-dim);
+    padding: 4px 7px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-text { font-size: 12px; color: var(--muted); }
+  .step-text b { color: var(--text); }
+
+  /* BUTTONS PREVIEW */
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .fake-btn {
+    padding: 5px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    border: 1px solid;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .fake-btn.green { border-color: var(--green); color: var(--green); background: #0a1a0a; }
+  .fake-btn.blue  { border-color: var(--blue);  color: var(--blue);  background: #0a1020; }
+  .fake-btn.yellow{ border-color: var(--yellow);color: var(--yellow);background: #1a1500; }
+  .fake-btn.red   { border-color: var(--red);   color: var(--red);   background: #1a0a0a; }
+  .fake-btn.gray  { border-color: var(--dim);   color: var(--muted); background: var(--bg3); }
+
+  /* TILES TABLE */
+  .tile-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
+  .tile-table th {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+    color: var(--dim);
+    font-size: 10px;
+  }
+  .tile-table td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    color: var(--muted);
+    vertical-align: middle;
+  }
+  .tile-table tr:hover td { background: var(--bg3); }
+  .tile-dot {
+    width: 20px; height: 20px;
+    display: inline-block;
+    border: 1px solid;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  .key {
+    display: inline-block;
+    background: var(--bg3);
+    border: 1px solid var(--dim);
+    border-bottom: 2px solid var(--dim);
+    padding: 1px 7px;
+    font-size: 11px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* SHORTCUTS TABLE */
+  .kb-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; }
+  .kb-table td { border: 1px solid var(--border); padding: 8px 14px; color: var(--muted); }
+  .kb-table tr:hover td { background: var(--bg3); }
+  .kb-table td:first-child { color: var(--text); width: 180px; }
+
+  /* TIP BOX */
+  .tip {
+    border-left: 3px solid var(--yellow);
+    background: #1a1500;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .tip b { color: var(--yellow); }
+  .warn {
+    border-left: 3px solid var(--red);
+    background: #1a0a0a;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .warn b { color: var(--red); }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .flow-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    font-size: 11px;
+    color: var(--text);
+    text-align: center;
+    min-width: 120px;
+  }
+  .flow-box small { display: block; color: var(--muted); font-size: 10px; margin-top: 3px; }
+  .flow-arrow {
+    color: var(--green);
+    font-size: 18px;
+    padding: 0 8px;
+  }
+
+  /* MINI LEGEND */
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<div id="hero">
+  <h1>LEVEL EDITOR <span class="version">GUIDA</span></h1>
+  <p>Come usare l'editor per creare, modificare e gestire i livelli del gioco platformer.</p>
+</div>
+
+<nav id="nav">
+  <a href="#inizio">Inizio rapido</a>
+  <a href="#interfaccia">Interfaccia</a>
+  <a href="#tiles">Tiles</a>
+  <a href="#strumenti">Strumenti</a>
+  <a href="#livelli">Gestione livelli</a>
+  <a href="#flusso">Flusso di lavoro</a>
+  <a href="#scorciatoie">Scorciatoie</a>
+</nav>
+
+<div class="content">
+
+  <!-- INIZIO RAPIDO -->
+  <div class="section" id="inizio">
+    <div class="section-title"><span class="section-num">01</span> INIZIO RAPIDO</div>
+    <p>Per iniziare subito senza leggere tutto:</p>
+    <div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-text">Premi <b>🌐 Da GitHub</b> (o 📂 Carica level.js dal PC) — i tuoi livelli appaiono nella colonna sinistra.</div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-text">Clicca <b>✎ modifica</b> su un livello esistente oppure premi <b>+ inserisci qui</b> tra due livelli per crearne uno nuovo.</div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-text">Disegna sulla griglia con il mouse. Seleziona il tile dalla colonna destra (o usa i tasti <b>1–8</b>).</div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-text">Premi <b>✔ Salva livello</b> quando hai finito. La miniatura si aggiorna.</div></div>
+      <div class="step"><div class="step-n">5</div><div class="step-text">Premi <b>💾 Scarica level.js</b>, poi incolla il file su GitHub sostituendo quello vecchio.</div></div>
+    </div>
+  </div>
+
+  <!-- INTERFACCIA -->
+  <div class="section" id="interfaccia">
+    <div class="section-title"><span class="section-num">02</span> INTERFACCIA</div>
+    <p>L'editor è diviso in tre aree principali:</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">A</div>
+        <div class="step-text"><b>Barra superiore</b> — pulsanti per caricare/salvare file, ridimensionare la griglia, undo e zoom.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">B</div>
+        <div class="step-text"><b>Colonna sinistra (Livelli)</b> — lista di tutti i livelli con miniatura. Permette di riordinare, modificare, eliminare e inserire nuovi livelli.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">C</div>
+        <div class="step-text"><b>Editor centrale</b> — griglia di disegno con palette tiles a sinistra e strumenti. Qui si disegna il livello.</div>
+      </div>
+    </div>
+
+    <p>I pulsanti nella barra superiore:</p>
+    <div class="btn-row">
+      <span class="fake-btn blue">📂 Carica level.js</span>
+      <span class="fake-btn blue">🌐 Da GitHub</span>
+      <span class="fake-btn blue">💾 Scarica level.js</span>
+      <span class="fake-btn gray">+ Nuovo livello</span>
+      <span class="fake-btn gray">↩ Undo</span>
+      <span class="fake-btn yellow">✔ Salva livello</span>
+      <span class="fake-btn gray">Ridimensiona</span>
+    </div>
+
+    <div class="tip"><b>💡 Nota:</b> <b>Salva livello</b> salva solo nella lista in memoria. Per aggiornare il file su GitHub bisogna fare <b>Scarica level.js</b> e caricarlo manualmente.</div>
+  </div>
+
+  <!-- TILES -->
+  <div class="section" id="tiles">
+    <div class="section-title"><span class="section-num">03</span> TILES</div>
+    <p>Ogni cella della griglia contiene un carattere che il gioco interpreta così:</p>
+
+    <table class="tile-table">
+      <thead>
+        <tr><th>Tasto</th><th>Tile</th><th>Carattere</th><th>Descrizione</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="key">1</span></td>
+          <td><span class="tile-dot" style="background:#0d1117;border-color:#161b22;"></span> Vuoto</td>
+          <td><b>.</b></td>
+          <td>Spazio vuoto percorribile</td>
+        </tr>
+        <tr>
+          <td><span class="key">2</span></td>
+          <td><span class="tile-dot" style="background:#374151;border-color:#4b5563;"></span> Muro</td>
+          <td><b>#</b></td>
+          <td>Piattaforma solida, blocca il movimento</td>
+        </tr>
+        <tr>
+          <td><span class="key">3</span></td>
+          <td><span class="tile-dot" style="background:#7f1d1d;border-color:#dc2626;"></span> Lava</td>
+          <td><b>+</b></td>
+          <td>Lava statica — toccarla = Game Over</td>
+        </tr>
+        <tr>
+          <td><span class="key">4</span></td>
+          <td><span class="tile-dot" style="background:#7c2d12;border-color:#ea580c;"></span> Lava H</td>
+          <td><b>=</b></td>
+          <td>Lava mobile orizzontale (si muove da sola)</td>
+        </tr>
+        <tr>
+          <td><span class="key">5</span></td>
+          <td><span class="tile-dot" style="background:#78350f;border-color:#d97706;"></span> Lava V</td>
+          <td><b>|</b></td>
+          <td>Lava mobile verticale (si muove da sola)</td>
+        </tr>
+        <tr>
+          <td><span class="key">6</span></td>
+          <td><span class="tile-dot" style="background:#451a03;border-color:#92400e;"></span> Lava ↓</td>
+          <td><b>v</b></td>
+          <td>Lava che cade dall'alto</td>
+        </tr>
+        <tr>
+          <td><span class="key">7</span></td>
+          <td><span class="tile-dot" style="background:#713f12;border-color:#eab308;border-radius:50%;"></span> Moneta</td>
+          <td><b>o</b></td>
+          <td>Moneta da raccogliere — serve raccoglierle tutte</td>
+        </tr>
+        <tr>
+          <td><span class="key">8</span></td>
+          <td><span class="tile-dot" style="background:#14532d;border-color:#22c55e;"></span> Player</td>
+          <td><b>@</b></td>
+          <td>Punto di spawn del giocatore — metterne <b>uno solo</b></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="warn"><b>⚠ Attenzione:</b> mettere più di un <b>@</b> nel livello causa comportamenti imprevisti. Ogni livello deve averne esattamente uno.</div>
+  </div>
+
+  <!-- STRUMENTI -->
+  <div class="section" id="strumenti">
+    <div class="section-title"><span class="section-num">04</span> STRUMENTI DI DISEGNO</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">✏</div>
+        <div class="step-text">
+          <b>Penna</b> — disegna trascinando il mouse. Tieni premuto e trascina per una linea continua. Lo strumento predefinito.
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">🪣</div>
+        <div class="step-text">
+          <b>Riempi (Flood Fill)</b> — clicca su un'area e la riempie tutta col tile selezionato. Perfetto per pavimenti e sfondi grandi.
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">╱</div>
+        <div class="step-text">
+          <b>Linea</b> — primo clic = punto di partenza (vedi anteprima verde), secondo clic = punto di arrivo. Disegna una linea retta tra i due punti. Ottimo per muri e piattaforme dritte.
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:16px;">Per <b>navigare la griglia</b>:</p>
+    <div class="steps">
+      <div class="step"><div class="step-n">🔍</div><div class="step-text"><b>Zoom</b> — rotella del mouse sopra la griglia. Il campo Zoom in alto permette di inserire un valore preciso.</div></div>
+      <div class="step"><div class="step-n">✋</div><div class="step-text"><b>Pan (scorri)</b> — tieni premuto <span class="key">Space</span> e trascina. Oppure clicca con il tasto centrale del mouse.</div></div>
+    </div>
+
+    <div class="tip"><b>💡 Suggerimento:</b> Per creare una piattaforma lunga usa <b>Linea</b> — molto più veloce che trascinare la penna per tutta la larghezza del livello.</div>
+  </div>
+
+  <!-- GESTIONE LIVELLI -->
+  <div class="section" id="livelli">
+    <div class="section-title"><span class="section-num">05</span> GESTIONE LIVELLI</div>
+
+    <p>La colonna sinistra mostra tutti i livelli caricati. Ogni card mostra:</p>
+    <div class="legend-grid">
+      <div class="legend-item">🔢 <span>Numero posizione</span></div>
+      <div class="legend-item">📐 <span>Dimensioni (righe)</span></div>
+      <div class="legend-item">🪙 <span>Numero monete</span></div>
+      <div class="legend-item">@ <span>Presenza spawn</span></div>
+      <div class="legend-item">🖼 <span>Miniatura del livello</span></div>
+    </div>
+
+    <div class="steps" style="margin-top:16px;">
+      <div class="step">
+        <div class="step-n" style="color:var(--yellow);background:#1a1200;">✎</div>
+        <div class="step-text"><b>Modifica</b> — apre il livello nell'editor. Il bordo della card diventa giallo quando è in modifica.</div>
+      </div>
+      <div class="step">
+        <div class="step-n" style="color:var(--red);background:#1a0000;">✕</div>
+        <div class="step-text"><b>Elimina</b> — chiede conferma prima di rimuovere il livello.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">⇅</div>
+        <div class="step-text"><b>Riordina</b> — trascina una card su un'altra per cambiare l'ordine dei livelli.</div>
+      </div>
+      <div class="step">
+        <div class="step-n">+</div>
+        <div class="step-text"><b>Inserisci qui</b> — i piccoli pulsanti tratteggiati tra le card aprono un nuovo livello vuoto in quella posizione esatta.</div>
+      </div>
+    </div>
+
+    <div class="tip"><b>💡 Nota:</b> dopo aver riordinato o eliminato dei livelli, ricordati di fare <b>💾 Scarica level.js</b> per salvare le modifiche.</div>
+  </div>
+
+  <!-- FLUSSO -->
+  <div class="section" id="flusso">
+    <div class="section-title"><span class="section-num">06</span> FLUSSO DI LAVORO CONSIGLIATO</div>
+
+    <p><b>Per modificare livelli esistenti:</b></p>
+    <div class="flow">
+      <div class="flow-box">🌐 Carica da GitHub<small>raw.githubusercontent.com</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">✎ Modifica<small>apri nell'editor</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">✔ Salva livello<small>aggiorna lista</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">💾 Scarica level.js<small>file aggiornato</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">GitHub<small>incolla e commit</small></div>
+    </div>
+
+    <p style="margin-top:20px;"><b>Per aggiungere un nuovo livello:</b></p>
+    <div class="flow">
+      <div class="flow-box">🌐 Carica da GitHub<small>prima di tutto</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">+ inserisci qui<small>scegli posizione</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Disegna<small>griglia editor</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">✔ Salva livello</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">💾 Scarica level.js</div>
+    </div>
+
+    <div class="warn" style="margin-top:20px;"><b>⚠ Attenzione:</b> se carichi un <b>level.js</b> dopo aver già iniziato a disegnare senza salvare, il lavoro non salvato viene perso. Carica sempre il file <b>prima</b> di iniziare a disegnare.</div>
+  </div>
+
+  <!-- SCORCIATOIE -->
+  <div class="section" id="scorciatoie">
+    <div class="section-title"><span class="section-num">07</span> SCORCIATOIE DA TASTIERA</div>
+
+    <table class="kb-table">
+      <tr><td><span class="key">1</span> … <span class="key">8</span></td><td>Seleziona tile (Vuoto → Player)</td></tr>
+      <tr><td><span class="key">Ctrl</span> + <span class="key">Z</span></td><td>Annulla ultima azione (fino a 40 livelli)</td></tr>
+      <tr><td><span class="key">Space</span> + drag</td><td>Scorri la griglia (pan)</td></tr>
+      <tr><td>Rotella mouse</td><td>Zoom in / out centrato sul cursore</td></tr>
+      <tr><td>Tasto centrale mouse + drag</td><td>Pan alternativo</td></tr>
+      <tr><td>Click sinistro + drag</td><td>Disegna (penna) o imposta punto linea</td></tr>
+    </table>
+
+    <div class="tip" style="margin-top:20px;"><b>💡 Flusso veloce:</b> usa <span class="key">2</span> per i muri, <span class="key">3</span> per la lava, <span class="key">7</span> per le monete, <span class="key">8</span> per il player — senza mai toccare la palette con il mouse.</div>
+  </div>
+
+</div>
+</body>
+</html>
