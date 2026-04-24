@@ -16,8 +16,11 @@ var CanvasDisplay = class CanvasDisplay {
     this.canvas = document.createElement("canvas");
     this.canvas.width = Math.min(1000, level.width * scale);
     this.canvas.height = Math.min(850, level.height * scale);
+	this.canvas.style.display ="block";
+	this.canvas.style.margin= "0 auto";
     parent.appendChild(this.canvas);
     this.cx = this.canvas.getContext("2d");
+	
 
     this.flipPlayer = false;
 
