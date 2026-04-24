@@ -91,7 +91,7 @@ let model = null;
 // ===== LOAD MODEL =====
 async function loadModel(){
     try {
-        let res = await fetch("https://nikczone.github.io/model.json");
+        let res = await fetch("model.json");
         model = await res.json();
     } catch(e) {
         console.log("fallback attivo");
