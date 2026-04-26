@@ -292,8 +292,8 @@ Return ONLY valid JSON array, no markdown, no explanation.
 Headlines:
 ${titles}`;
 
-  const resp = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-3-flash:generateContent?key=' + geminiKey, {
-    method: 'POST',
+  const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=' + geminiKey, {
+  method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
