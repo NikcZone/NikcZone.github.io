@@ -308,8 +308,11 @@ ${titles}`;
 
   const data = await resp.json();
   let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
-  text = text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-  
+  text = text.replace(/```json\n?/g,'')
+           .replace(/```\n?/g,'')
+           .replace(/^[^[\{]*/,'')
+           .replace(/[^\]\}]*$/,'')
+           .trim();
   let results;
   try { results = JSON.parse(text); } catch(e) { throw new Error('Risposta Gemini non valida'); }
 
