@@ -297,14 +297,50 @@ ${titles}`;
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { 
-        temperature: 0.2, 
-        maxOutputTokens: 4000,
-        
-      }
+      generationConfig: { temperature: 0.2, maxOutputTokens: 4000 }
     })
   });
 
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(err.error?.message || 'Errore Gemini API');
+  }
+
+  const data = await resp.json();
+  
+  // Salta i thought parts, prendi solo testo reale
+  let text = '';
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  for (const part of parts) {
+    if (part.text && !part.thought) {
+      text = part.text;
+      break;
+    }
+  }
+  if (!text) text = parts?.[0]?.text || '';
+  if (!text) throw new Error('Risposta Gemini vuota');
+
+  // Estrai JSON
+  const start = text.indexOf('[');
+  const end = text.lastIndexOf(']');
+  if (start === -1 || end === -1) throw new Error('JSON non trovato');
+  text = text.substring(start, end + 1);
+
+  let results;
+  try { results = JSON.parse(text); } 
+  catch(e) { throw new Error('Risposta Gemini non valida'); }
+
+  return articles.map((a, i) => {
+    const r = results.find(x => x.index === i+1) || {};
+    return {
+      ...a,
+      sentiment: r.sentiment || 'neutral',
+      score: r.score || 0,
+      topic: r.topic || 'altro',
+      countryResolved: r.country || a.country
+    };
+  });
+}
   if (!resp.ok) {
     const err = await resp.json();
     throw new Error(err.error?.message || 'Errore Gemini API');
