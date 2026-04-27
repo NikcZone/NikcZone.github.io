@@ -282,6 +282,7 @@ async function analyzeWithGemini(articles) {
   }
   if (!text && parts.length > 0 && parts[0].text) text = parts[0].text;
   if (!text) throw new Error('Risposta Gemini vuota');
+  console.log('GEMINI RAW:', text);
 
   // Pulizia e estrazione JSON
   text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
