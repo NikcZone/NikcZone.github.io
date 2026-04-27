@@ -292,12 +292,16 @@ Return ONLY valid JSON array, no markdown, no explanation.
 Headlines:
 ${titles}`;
 
-  const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + geminiKey, {
+  const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=' + geminiKey, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 4000 }
+      generationConfig: { 
+        temperature: 0.2, 
+        maxOutputTokens: 4000,
+        responseMimeType: "application/json"
+      }
     })
   });
 
@@ -307,15 +311,36 @@ ${titles}`;
   }
 
   const data = await resp.json();
-  let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+  
+  // Cerca il testo in tutti i parts, saltando i thought parts
+  let text = '';
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  for (const part of parts) {
+    if (part.text && !part.thought) {
+      text = part.text;
+      break;
+    }
+  }
+  
+  if (!text) throw new Error('Risposta Gemini vuota');
+  
+  // Pulizia robusta
   text = text.replace(/```json\n?/g,'')
-           .replace(/```\n?/g,'')
-           .replace(/^[^[\{]*/,'')
-           .replace(/[^\]\}]*$/,'')
-           .trim();
+             .replace(/```\n?/g,'')
+             .trim();
+  
+  // Estrai solo la parte JSON
+  const start = text.indexOf('[');
+  const end = text.lastIndexOf(']');
+  if (start === -1 || end === -1) throw new Error('JSON non trovato nella risposta');
+  text = text.substring(start, end + 1);
   
   let results;
-  try { results = JSON.parse(text); } catch(e) { throw new Error('Risposta Gemini non valida'); }
+  try { 
+    results = JSON.parse(text); 
+  } catch(e) { 
+    throw new Error('Risposta Gemini non valida: ' + e.message); 
+  }
 
   return articles.map((a, i) => {
     const r = results.find(x => x.index === i+1) || {};
@@ -328,7 +353,6 @@ ${titles}`;
     };
   });
 }
-
 function updateCountryMood() {
   const cm = {};
   const counts = {};
