@@ -236,12 +236,12 @@ async function fetchAndAnalyze() {
 }
 
 async function fetchGDELT() {
-  const url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:english&mode=ArtList&maxrecords=75&timespan=24h&sort=DateDesc&format=json';
+  const url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:english&mode=ArtList&maxrecords=275&timespan=24h&sort=DateDesc&format=json';
   const resp = await fetch(url);
   if (!resp.ok) throw new Error('Errore GDELT API');
   const data = await resp.json();
   if (!data.articles || data.articles.length === 0) throw new Error('Nessun articolo da GDELT');
-  return data.articles.slice(0, 60).map(a => ({
+  return data.articles.slice(0, 260).map(a => ({
     title: a.title || '',
     url: a.url || '',
     source: a.domain || '',
