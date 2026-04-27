@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,11 +12,8 @@ body { font-family: var(--font-sans); background: transparent; }
 .api-input-row input { flex: 1; font-size: 14px; padding: 8px 12px; border: 0.5px solid var(--color-border-primary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); }
 .btn-primary { background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); padding: 8px 20px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; }
 .btn-primary:hover { opacity: 0.85; }
-.btn-secondary { background: transparent; color: var(--color-text-primary); border: 0.5px solid var(--color-border-primary); border-radius: var(--border-radius-md); padding: 8px 16px; font-size: 13px; cursor: pointer; }
-.btn-secondary:hover { background: var(--color-background-secondary); }
 .hint { font-size: 12px; color: var(--color-text-tertiary); }
 .hint a { color: var(--color-text-info); }
-
 .dashboard { display: none; }
 .top-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; }
 .top-bar h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
@@ -25,19 +21,16 @@ body { font-family: var(--font-sans); background: transparent; }
 .pill { padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); color: var(--color-text-secondary); transition: all 0.15s; }
 .pill.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: transparent; }
 .pill:hover:not(.active) { background: var(--color-background-primary); border-color: var(--color-border-secondary); }
-
 .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
 .metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
 .metric-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
 .metric-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
 .metric-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
-
 .map-container { position: relative; width: 100%; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--color-background-primary); margin-bottom: 1.5rem; }
 #worldMap { width: 100%; display: block; }
 .map-legend { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-top: 0.5px solid var(--color-border-tertiary); }
 .legend-label { font-size: 11px; color: var(--color-text-tertiary); }
 .legend-bar { flex: 1; height: 6px; border-radius: 3px; background: linear-gradient(to right, #E24B4A, #888780, #3B6D11); }
-
 .results-section { }
 .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .results-header h3 { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
@@ -59,22 +52,18 @@ body { font-family: var(--font-sans); background: transparent; }
 .sentiment-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
 .sentiment-label { font-size: 11px; color: var(--color-text-secondary); }
 .sentiment-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
 .loading-overlay { position: absolute; inset: 0; background: var(--color-background-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border-radius: var(--border-radius-lg); z-index: 10; }
 .spinner { width: 28px; height: 28px; border: 2px solid var(--color-border-tertiary); border-top-color: var(--color-text-primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { font-size: 13px; color: var(--color-text-secondary); }
-
 .analyze-btn-row { text-align: center; margin: 1.5rem 0; }
 .analyze-big-btn { background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-lg); padding: 14px 32px; font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
 .analyze-big-btn:hover { opacity: 0.85; }
 .analyze-big-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .error-msg { color: var(--color-text-danger); font-size: 13px; padding: 10px; background: var(--color-background-danger); border-radius: var(--border-radius-md); margin: 10px 0; }
-
 .tooltip { position: fixed; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 8px 12px; font-size: 12px; pointer-events: none; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.12); max-width: 200px; display: none; }
 .tooltip-country { font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
 .tooltip-mood { color: var(--color-text-secondary); }
-
 .empty-state { text-align: center; padding: 3rem 1rem; color: var(--color-text-tertiary); font-size: 14px; }
 </style>
 </head>
@@ -85,9 +74,9 @@ body { font-family: var(--font-sans); background: transparent; }
     <p>Analizza il sentiment delle notizie mondiali in tempo reale usando GDELT come fonte dati e Gemini AI per la classificazione tematica.</p>
     <div class="api-input-row">
       <input type="password" id="geminiKey" placeholder="Inserisci la tua Gemini API key..." />
-      <button class="btn-primary" onclick="startDashboard()">Avvia ↗</button>
+      <button class="btn-primary" onclick="startDashboard()">Avvia &#x2197;</button>
     </div>
-    <p class="hint">Ottieni una API key gratuita su <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> — nessuna carta di credito richiesta.</p>
+    <p class="hint">Ottieni una API key gratuita su <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> &mdash; nessuna carta di credito richiesta.</p>
   </div>
 
   <div class="dashboard" id="dashboard">
@@ -105,11 +94,11 @@ body { font-family: var(--font-sans); background: transparent; }
     </div>
 
     <div class="metrics-row" id="metricsRow">
-      <div class="metric-card"><div class="metric-label">Articoli analizzati</div><div class="metric-value" id="mArticoli">—</div></div>
-      <div class="metric-card"><div class="metric-label">Mood globale</div><div class="metric-value" id="mMood">—</div><div class="metric-sub" id="mMoodSub"></div></div>
-      <div class="metric-card"><div class="metric-label">Positivi</div><div class="metric-value" id="mPos" style="color:#3B6D11;">—</div></div>
-      <div class="metric-card"><div class="metric-label">Negativi</div><div class="metric-value" id="mNeg" style="color:#A32D2D;">—</div></div>
-      <div class="metric-card"><div class="metric-label">Paesi coperti</div><div class="metric-value" id="mPaesi">—</div></div>
+      <div class="metric-card"><div class="metric-label">Articoli analizzati</div><div class="metric-value" id="mArticoli">&mdash;</div></div>
+      <div class="metric-card"><div class="metric-label">Mood globale</div><div class="metric-value" id="mMood">&mdash;</div><div class="metric-sub" id="mMoodSub"></div></div>
+      <div class="metric-card"><div class="metric-label">Positivi</div><div class="metric-value" id="mPos" style="color:#3B6D11;">&mdash;</div></div>
+      <div class="metric-card"><div class="metric-label">Negativi</div><div class="metric-value" id="mNeg" style="color:#A32D2D;">&mdash;</div></div>
+      <div class="metric-card"><div class="metric-label">Paesi coperti</div><div class="metric-value" id="mPaesi">&mdash;</div></div>
     </div>
 
     <div class="map-container">
@@ -185,12 +174,9 @@ function drawMap(world) {
   const projection = d3.geoNaturalEarth1().scale(145).translate([width/2, height/2]);
   const path = d3.geoPath(projection);
   const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-
   svg.selectAll('*').remove();
   svg.append('rect').attr('width', width).attr('height', height).attr('fill', isDark ? '#1a1a1a' : '#f0f4f8').attr('rx', 0);
-
   const tooltip = document.getElementById('tooltip');
-
   svg.selectAll('.country')
     .data(topojson.feature(world, world.objects.countries).features)
     .join('path')
@@ -215,13 +201,11 @@ function drawMap(world) {
       tooltip.style.left = (event.clientX + 12) + 'px';
       tooltip.style.top = (event.clientY - 10) + 'px';
       document.getElementById('ttCountry').textContent = name;
-      document.getElementById('ttMood').textContent = mood !== undefined 
+      document.getElementById('ttMood').textContent = mood !== undefined
         ? (mood > 0 ? '+ Positivo (' + (mood*100).toFixed(0) + '%)' : mood < 0 ? '- Negativo (' + (Math.abs(mood)*100).toFixed(0) + '%)' : 'Neutro')
         : 'Nessun dato';
     })
-    .on('mouseleave', function() {
-      tooltip.style.display = 'none';
-    });
+    .on('mouseleave', function() { tooltip.style.display = 'none'; });
 }
 
 async function fetchAndAnalyze() {
@@ -231,43 +215,32 @@ async function fetchAndAnalyze() {
   document.getElementById('errorMsg').innerHTML = '';
   document.getElementById('mapLoading').style.display = 'flex';
   document.getElementById('loadingText').textContent = 'Caricamento notizie da GDELT...';
-
   try {
     const articles = await fetchGDELT();
-    document.getElementById('loadingText').textContent = `Analisi AI di ${articles.length} titoli...`;
-    
+    document.getElementById('loadingText').textContent = 'Analisi AI di ' + articles.length + ' titoli...';
     const analyzed = await analyzeWithGemini(articles);
     allArticles = analyzed;
-    
     updateMetrics();
     updateCountryMood();
     if (worldGeo) drawMap(worldGeo);
     renderArticles(allArticles);
-    
     document.getElementById('mapLoading').style.display = 'none';
     btn.textContent = 'Aggiorna analisi';
     btn.disabled = false;
   } catch(e) {
     document.getElementById('mapLoading').style.display = 'none';
-    document.getElementById('errorMsg').innerHTML = `<div class="error-msg">Errore: ${e.message}</div>`;
+    document.getElementById('errorMsg').innerHTML = '<div class="error-msg">Errore: ' + e.message + '</div>';
     btn.textContent = 'Riprova';
     btn.disabled = false;
   }
 }
 
 async function fetchGDELT() {
-  const now = new Date();
-  const pad = n => n.toString().padStart(2,'0');
-  const dateStr = now.getFullYear().toString() + pad(now.getMonth()+1) + pad(now.getDate());
-  
-  const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:english&mode=ArtList&maxrecords=75&timespan=24h&sort=DateDesc&format=json`;
-  
+  const url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:english&mode=ArtList&maxrecords=75&timespan=24h&sort=DateDesc&format=json';
   const resp = await fetch(url);
   if (!resp.ok) throw new Error('Errore GDELT API');
   const data = await resp.json();
-  
   if (!data.articles || data.articles.length === 0) throw new Error('Nessun articolo da GDELT');
-  
   return data.articles.slice(0, 60).map(a => ({
     title: a.title || '',
     url: a.url || '',
@@ -278,184 +251,111 @@ async function fetchGDELT() {
 }
 
 async function analyzeWithGemini(articles) {
-  const titles = articles.map((a, i) => `${i+1}. [${a.country}] ${a.title}`).join('\n');
-  
-  const prompt = `Analyze these news headlines and return a JSON array. For each headline return:
-- index (number, 1-based)
-- sentiment: "positive", "negative", or "neutral"  
-- score: float from -1.0 (very negative) to 1.0 (very positive)
-- topic: one of "politica", "clima", "economia", "conflitti", "scandali", "cronaca", "altro"
-- country: the country name in English (use the bracket tag or infer from context)
+  const titles = articles.map((a, i) => (i+1) + '. [' + a.country + '] ' + a.title).join('\n');
 
-Return ONLY valid JSON array, no markdown, no explanation.
-
-Headlines:
-${titles}`;
+  const prompt = 'Analyze these news headlines and return a JSON array. For each headline return:\n- index (number, 1-based)\n- sentiment: "positive", "negative", or "neutral"\n- score: float from -1.0 (very negative) to 1.0 (very positive)\n- topic: one of "politica", "clima", "economia", "conflitti", "scandali", "cronaca", "altro"\n- country: the country name in English\n\nReturn ONLY a valid JSON array, no markdown, no explanation.\n\nHeadlines:\n' + titles;
 
   const resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + geminiKey, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 4000 }
+      generationConfig: { temperature: 0.2, maxOutputTokens: 3000 }
     })
   });
 
   if (!resp.ok) {
     const err = await resp.json();
-    throw new Error(err.error?.message || 'Errore Gemini API');
+    throw new Error(err.error && err.error.message ? err.error.message : 'Errore Gemini API');
   }
 
   const data = await resp.json();
-  
-  // Salta i thought parts, prendi solo testo reale
+
+  // Cerca testo reale saltando i thought parts di Gemini 2.5
   let text = '';
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  for (const part of parts) {
-    if (part.text && !part.thought) {
-      text = part.text;
+  const parts = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts ? data.candidates[0].content.parts : [];
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i].text && !parts[i].thought) {
+      text = parts[i].text;
       break;
     }
   }
-  if (!text) text = parts?.[0]?.text || '';
+  if (!text && parts.length > 0 && parts[0].text) text = parts[0].text;
   if (!text) throw new Error('Risposta Gemini vuota');
 
-  // Estrai JSON
+  // Pulizia e estrazione JSON
+  text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   const start = text.indexOf('[');
   const end = text.lastIndexOf(']');
-  if (start === -1 || end === -1) throw new Error('JSON non trovato');
+  if (start === -1 || end === -1) throw new Error('JSON non trovato nella risposta Gemini');
   text = text.substring(start, end + 1);
 
   let results;
-  try { results = JSON.parse(text); } 
-  catch(e) { throw new Error('Risposta Gemini non valida'); }
+  try {
+    results = JSON.parse(text);
+  } catch(e) {
+    throw new Error('Risposta Gemini non valida');
+  }
 
   return articles.map((a, i) => {
-    const r = results.find(x => x.index === i+1) || {};
-    return {
-      ...a,
+    const r = results.find(function(x) { return x.index === i+1; }) || {};
+    return Object.assign({}, a, {
       sentiment: r.sentiment || 'neutral',
       score: r.score || 0,
       topic: r.topic || 'altro',
       countryResolved: r.country || a.country
-    };
+    });
   });
 }
-  if (!resp.ok) {
-    const err = await resp.json();
-    throw new Error(err.error?.message || 'Errore Gemini API');
-  }
 
- const data = await resp.json();
-
-// Cerca testo saltando thought parts
-let text = '';
-const parts = data.candidates?.[0]?.content?.parts || [];
-for (const part of parts) {
-  if (part.text && !part.thought) {
-    text += part.text;
-  }
-}
-
-if (!text) text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-  
-  if (!text) throw new Error('Risposta Gemini vuota');
-  
-  // Pulizia robusta
-  text = text.replace(/```json\n?/g,'')
-           .replace(/```\n?/g,'')
-           .replace(/^[^[\{]*/,'')
-           .replace(/[^\]\}]*$/,'')
-           .trim();
-  
-  // Estrai solo la parte JSON
-  const start = text.indexOf('[');
-  const end = text.lastIndexOf(']');
-  if (start === -1 || end === -1) throw new Error('JSON non trovato nella risposta');
-  text = text.substring(start, end + 1);
-  
-  let results;
-  try { 
-    results = JSON.parse(text); 
-  } catch(e) { 
-    throw new Error('Risposta Gemini non valida: ' + e.message); 
-  }
-
-  return articles.map((a, i) => {
-    const r = results.find(x => x.index === i+1) || {};
-    return {
-      ...a,
-      sentiment: r.sentiment || 'neutral',
-      score: r.score || 0,
-      topic: r.topic || 'altro',
-      countryResolved: r.country || a.country
-    };
-  });
-}
 function updateCountryMood() {
   const cm = {};
   const counts = {};
-  allArticles.forEach(a => {
+  allArticles.forEach(function(a) {
     const c = a.countryResolved;
     if (!c || c === 'Unknown') return;
     cm[c] = (cm[c] || 0) + a.score;
     counts[c] = (counts[c] || 0) + 1;
   });
-  Object.keys(cm).forEach(c => { cm[c] = cm[c] / counts[c]; });
+  Object.keys(cm).forEach(function(c) { cm[c] = cm[c] / counts[c]; });
   countryMood = cm;
 }
 
 function updateMetrics() {
-  const filtered = activeFilter === 'tutti' ? allArticles : allArticles.filter(a => a.topic === activeFilter);
-  const pos = filtered.filter(a => a.sentiment === 'positive').length;
-  const neg = filtered.filter(a => a.sentiment === 'negative').length;
-  const avgScore = filtered.length ? filtered.reduce((s,a) => s+a.score, 0)/filtered.length : 0;
-  const countries = new Set(filtered.map(a => a.countryResolved).filter(c => c && c !== 'Unknown')).size;
-
+  const filtered = activeFilter === 'tutti' ? allArticles : allArticles.filter(function(a) { return a.topic === activeFilter; });
+  const pos = filtered.filter(function(a) { return a.sentiment === 'positive'; }).length;
+  const neg = filtered.filter(function(a) { return a.sentiment === 'negative'; }).length;
+  const avgScore = filtered.length ? filtered.reduce(function(s,a) { return s+a.score; }, 0) / filtered.length : 0;
+  const countries = new Set(filtered.map(function(a) { return a.countryResolved; }).filter(function(c) { return c && c !== 'Unknown'; })).size;
   document.getElementById('mArticoli').textContent = filtered.length;
   document.getElementById('mPos').textContent = pos;
   document.getElementById('mNeg').textContent = neg;
   document.getElementById('mPaesi').textContent = countries;
-  
   const moodScore = Math.round(avgScore * 100);
   document.getElementById('mMood').textContent = (moodScore > 0 ? '+' : '') + moodScore;
   document.getElementById('mMoodSub').textContent = avgScore > 0.1 ? 'prevalentemente positivo' : avgScore < -0.1 ? 'prevalentemente negativo' : 'bilanciato';
 }
 
 function renderArticles(articles) {
-  const filtered = activeFilter === 'tutti' ? articles : articles.filter(a => a.topic === activeFilter);
+  const filtered = activeFilter === 'tutti' ? articles : articles.filter(function(a) { return a.topic === activeFilter; });
   const grid = document.getElementById('resultsGrid');
-  document.getElementById('resultsTitle').textContent = `${filtered.length} titoli analizzati`;
-  
+  document.getElementById('resultsTitle').textContent = filtered.length + ' titoli analizzati';
   if (filtered.length === 0) {
     grid.innerHTML = '<div class="empty-state">Nessun articolo per questo filtro.</div>';
     return;
   }
-
-  grid.innerHTML = filtered.map(a => {
+  grid.innerHTML = filtered.map(function(a) {
     const scoreColor = a.score > 0.2 ? '#3B6D11' : a.score < -0.2 ? '#A32D2D' : '#888780';
     const barWidth = Math.round(Math.abs(a.score) * 100);
     const scoreLabel = a.score > 0 ? '+' + (a.score*100).toFixed(0) + '%' : (a.score*100).toFixed(0) + '%';
-    return `<div class="article-card">
-      <div class="article-meta">
-        <span class="country-badge">${a.countryResolved || a.country || '?'}</span>
-        <span class="topic-badge topic-${a.topic}">${a.topic}</span>
-      </div>
-      <div class="article-title">${a.title}</div>
-      <div class="sentiment-row">
-        <div class="sentiment-dot" style="background:${scoreColor};"></div>
-        <span class="sentiment-label">${a.sentiment} &bull; ${scoreLabel}</span>
-      </div>
-      <div class="sentiment-bar" style="background:${scoreColor}; width:${barWidth}%; max-width:100%;"></div>
-    </div>`;
+    return '<div class="article-card"><div class="article-meta"><span class="country-badge">' + (a.countryResolved || a.country || '?') + '</span><span class="topic-badge topic-' + a.topic + '">' + a.topic + '</span></div><div class="article-title">' + a.title + '</div><div class="sentiment-row"><div class="sentiment-dot" style="background:' + scoreColor + ';"></div><span class="sentiment-label">' + a.sentiment + ' &bull; ' + scoreLabel + '</span></div><div class="sentiment-bar" style="background:' + scoreColor + '; width:' + barWidth + '%; max-width:100%;"></div></div>';
   }).join('');
 }
 
-document.getElementById('filterPills').addEventListener('click', e => {
+document.getElementById('filterPills').addEventListener('click', function(e) {
   const pill = e.target.closest('.pill');
   if (!pill) return;
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pill').forEach(function(p) { p.classList.remove('active'); });
   pill.classList.add('active');
   activeFilter = pill.dataset.topic;
   if (allArticles.length > 0) {
