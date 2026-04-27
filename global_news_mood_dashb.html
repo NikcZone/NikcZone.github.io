@@ -235,21 +235,46 @@ async function fetchAndAnalyze() {
   }
 }
 
-async function fetchGDELT() {
-  const url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:english&mode=ArtList&maxrecords=105&timespan=24h&sort=DateDesc&format=json';
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error('Errore GDELT API');
-  const data = await resp.json();
-  if (!data.articles || data.articles.length === 0) throw new Error('Nessun articolo da GDELT');
-  return data.articles.slice(0, 90).map(a => ({
-    title: a.title || '',
-    url: a.url || '',
-    source: a.domain || '',
-    country: a.sourcecountry || 'Unknown',
-    seendate: a.seendate || ''
-  })).filter(a => a.title.length > 10);
-}
+//async function fetchGDELT() {
+  //const url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:english&mode=ArtList&maxrecords=105&timespan=24h&sort=DateDesc&format=json';
+ // const resp = await fetch(url);
+ // if (!resp.ok) throw new Error('Errore GDELT API');
+//  const data = await resp.json();
+ // if (!data.articles || data.articles.length === 0) throw new Error('Nessun articolo da GDELT');
+ // return data.articles.slice(0, 90).map(a => ({
+  //  title: a.title || '',
+  //  url: a.url || '',
+  //  source: a.domain || '',
+  //  country: a.sourcecountry || 'Unknown',
+  //  seendate: a.seendate || ''
+ // })).filter(a => a.title.length > 10);
+//}
 
+async function fetchGDELT() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondi
+
+  try {
+    const url = 'https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:english&mode=ArtList&maxrecords=275&timespan=24h&sort=DateDesc&format=json';
+    const resp = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!resp.ok) throw new Error('Errore GDELT API');
+    const data = await resp.json();
+    if (!data.articles || data.articles.length === 0) throw new Error('Nessun articolo da GDELT');
+    return data.articles.slice(0, 260).map(a => ({
+      title: a.title || '',
+      url: a.url || '',
+      source: a.domain || '',
+      country: a.sourcecountry || 'Unknown',
+      seendate: a.seendate || ''
+    })).filter(a => a.title.length > 10);
+  } catch(e) {
+    clearTimeout(timeoutId);
+    if (e.name === 'AbortError') throw new Error('GDELT timeout — riprova tra poco');
+    throw e;
+  }
+}
+  
 async function analyzeWithGemini(articles) {
   const titles = articles.map((a, i) => (i+1) + '. [' + a.country + '] ' + a.title).join('\n');
   
