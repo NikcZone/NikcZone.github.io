@@ -300,10 +300,7 @@ ${titles}`;
       generationConfig: { 
         temperature: 0.2, 
         maxOutputTokens: 4000,
-        responseMimeType: "application/json"
-        temperature: 0.2, 
-        maxOutputTokens: 4000,
-        thinkingConfig: { thinkingBudget: 0 }
+        
       }
     })
   });
@@ -313,17 +310,19 @@ ${titles}`;
     throw new Error(err.error?.message || 'Errore Gemini API');
   }
 
-  const data = await resp.json();
-  
-  // Cerca il testo in tutti i parts, saltando i thought parts
-  let text = '';
-  const parts = data.candidates?.[0]?.content?.parts || [];
-  for (const part of parts) {
-    if (part.text && !part.thought) {
-      text = part.text;
-      break;
-    }
+ const data = await resp.json();
+
+// Cerca testo saltando thought parts
+let text = '';
+const parts = data.candidates?.[0]?.content?.parts || [];
+for (const part of parts) {
+  if (part.text && !part.thought) {
+    text += part.text;
   }
+}
+
+if (!text) text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
   
   if (!text) throw new Error('Risposta Gemini vuota');
   
