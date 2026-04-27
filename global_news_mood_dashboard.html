@@ -259,15 +259,15 @@ async function analyzeWithGemini(articles) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-     contents: [{ parts: [{ text: prompt }] }],
-     generationConfig: { 
-      temperature: 0.2, 
-      maxOutputTokens: 8000,
-      thinkingConfig: {
+  contents: [{ parts: [{ text: prompt }] }],
+  generationConfig: { 
+    temperature: 0.2, 
+    maxOutputTokens: 8000,
+    thinkingConfig: {
       thinkingBudget: 0
-     }
     }
-  });
+  }
+})
 
   if (!resp.ok) {
     const err = await resp.json();
