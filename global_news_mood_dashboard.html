@@ -364,8 +364,10 @@ if (!text) text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   
   // Pulizia robusta
   text = text.replace(/```json\n?/g,'')
-             .replace(/```\n?/g,'')
-             .trim();
+           .replace(/```\n?/g,'')
+           .replace(/^[^[\{]*/,'')
+           .replace(/[^\]\}]*$/,'')
+           .trim();
   
   // Estrai solo la parte JSON
   const start = text.indexOf('[');
